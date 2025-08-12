@@ -12,11 +12,6 @@ SUPPORTED_AUDIO = {".wav", ".mp3", ".m4a", ".flac", ".aac", ".ogg", ".wma"}
 SUPPORTED_VIDEO = {".mp4", ".mkv", ".mov", ".avi", ".flv", ".webm"}
 SUPPORTED_ALL = SUPPORTED_AUDIO | SUPPORTED_VIDEO
 
-def select_outputs(args) -> set[str]:
-    if getattr(args, "only_merge_date", False):
-        return {"merge_date"}
-    # 默认全量（你也可以自定义）
-    return {"srt", "txt", "json", "merge", "merge_date"}
 
 def has_ffmpeg() -> bool:
     try:
@@ -60,46 +55,18 @@ def ensure_wav(input_path: Path, work_dir: Path) -> Path:
     return out
 
 
-def format_srt_time(t: float) -> str:
-    ms = int(round(t * 1000))
-    h, rem = divmod(ms, 3600000)
-    m, rem = divmod(rem, 60000)
-    s, ms = divmod(rem, 1000)
-    return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
+def write_merge_txt(segments: List[Dict[str, Any]], out_path: Path, min_chars: int = 200, max_chars: int = 250):
+    """
+    将相邻同一说话人的片段合并成段；若一段过长，以句号“。”优先切分，每段控制在 200–250 字。
+    输出格式：
+    speaker 0
+    这一段合并后的文本（可被拆成多个 200-250 字段落，每段之间空一行）
 
-def write_srt(segments: List[Dict[str, Any]], out_path: Path):
-    lines = []
-    for i, seg in enumerate(segments, start=1):
-        start = format_srt_time(float(seg.get("start", 0.0)))
-        end = format_srt_time(float(seg.get("end", 0.0)))
-        speaker = seg.get("speaker", "")
-        spk_prefix = f"{speaker}: " if speaker else ""
-        text = seg.get("text", "")
-        lines.append(f"{i}")
-        lines.append(f"{start} --> {end}")
-        lines.append(f"{spk_prefix}{text}".strip())
-        lines.append("")
-    out_path.write_text("\n".join(lines), encoding="utf-8")
-
-def write_txt(full_text: str, out_path: Path):
-    out_path.write_text(full_text.strip() + "\n", encoding="utf-8")
-
-def write_json(payload: Dict[str, Any], out_path: Path):
-    out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-
-def format_hms(t: float) -> str:
-    # 时间戳格式化为 00:00:00
-    h, rem = divmod(int(t), 3600)
-    m, rem = divmod(rem, 60)
-    s = int(rem)
-    return f"{h:02d}:{m:02d}:{s:02d}"
-
-def write_merge_date_txt(segments: List[Dict[str, Any]], out_path: Path, min_chars: int = 200, max_chars: int = 250):
-    def split_with_timestamps(text: str, start: float, end: float) -> List[Tuple[str, str, str]]:
-        """
-        将文本分割成 200–250 字左右的段落（按句号），并估算时间戳区间。
-        返回 [(start_str, end_str, text), ...]
-        """
+    speaker 1
+    ...
+    """
+    def split_into_paragraphs(text: str) -> List[str]:
+        # 保留句号作为边界；按“。”拆句，再按 min/max 长度聚合
         sentences = []
         buf = []
         for ch in text:
@@ -119,6 +86,7 @@ def write_merge_date_txt(segments: List[Dict[str, Any]], out_path: Path, min_cha
             if not cur:
                 cur = s
                 continue
+            # 若当前段不足 min_chars，则尽量继续累加；超过 max_chars 就换段
             if len(cur) < min_chars or (len(cur) + len(s) <= max_chars):
                 cur += s
             else:
@@ -126,68 +94,42 @@ def write_merge_date_txt(segments: List[Dict[str, Any]], out_path: Path, min_cha
                 cur = s
         if cur:
             paras.append(cur)
+        return paras
 
-        # 时间分段估算（线性均分）
-        total = len(paras)
-        t_start = float(start)
-        t_end = float(end)
-        t_step = (t_end - t_start) / max(total, 1)
-        out = []
-        for i, para in enumerate(paras):
-            ts_start = t_start + i * t_step
-            ts_end = ts_start + t_step
-            out.append((format_hms(ts_start), format_hms(ts_end), para.strip()))
-        return out
-
-    lines = []
-    last_spk = None
-    block_text = ""
-    block_start = None
-    block_end = None
+    lines: List[str] = []
+    last_speaker = None
+    buffer = []
 
     def flush_block():
-        nonlocal block_text, block_start, block_end, last_spk
-        if not block_text or block_start is None or block_end is None:
+        nonlocal buffer, last_speaker
+        if not buffer:
             return
-        chunks = split_with_timestamps(block_text, block_start, block_end)
-        for i, (ts1, ts2, text) in enumerate(chunks):
-            lines.append(f"{ts1}-{ts2}")
-            # 第一段标注 speaker，后续分段仍保留 speaker
-            lines.append(f"speaker {last_spk}")
-            lines.append(text)
-            lines.append("")  # 段落间空行
-        block_text = ""
-        block_start = None
-        block_end = None
+        block_text = "".join(buffer).strip()
+        if block_text:
+            lines.append(f"speaker {last_speaker}")
+            for para in split_into_paragraphs(block_text):
+                # 段落正文
+                lines.append(para.strip())
+                # 段落间空一行
+                lines.append("")
+        buffer = []
 
     for seg in segments:
-        spk = seg.get("speaker", "UNK")
-        text = seg.get("text", "").strip()
-        start = float(seg.get("start", 0.0))
-        end = float(seg.get("end", 0.0))
-
-        if last_spk is None:
-            last_spk = spk
-            block_start = start
-            block_end = end
-            block_text = text
-            continue
-
-        if spk != last_spk:
+        spk = seg.get("speaker", "UNK")  # 可能是 int/str，都允许
+        text = (seg.get("text", "") or "").strip()
+        # 碰到新说话人，先冲刷上一位说话人的合并段
+        if last_speaker is None:
+            last_speaker = spk
+        if spk != last_speaker:
             flush_block()
-            last_spk = spk
-            block_start = start
-            block_end = end
-            block_text = text
-        else:
-            # 累计时间和文本
-            block_text += text
-            block_end = end
+            last_speaker = spk
+        buffer.append(text)
 
-    flush_block()  # 最后一段
+    # 冲刷最后一段
+    flush_block()
 
-    out_path.write_text("\n".join(lines).strip() + "\n", encoding="utf-8")
-
+    out = "\n".join(lines).rstrip() + "\n"
+    out_path.write_text(out, encoding="utf-8")
 
 
 def mirror_output_path(input_base: Path, output_base: Path, file_path: Path, suffix: str) -> Path:
@@ -195,65 +137,34 @@ def mirror_output_path(input_base: Path, output_base: Path, file_path: Path, suf
     target = output_base / rel
     return target.with_suffix(suffix)
 
-def write_all_outputs(result: Dict[str, Any], base_path: Path):
-    segments = result.get("segments", [])
-    full_text = result.get("text", "")
-    payload = result
+# def write_all_outputs(result: Dict[str, Any], base_path: Path):
+    # segments = result.get("segments", [])
+    # full_text = result.get("text", "")
+    # payload = result
 
-    write_srt(segments, base_path.with_suffix(".srt"))
-    write_txt(full_text, base_path.with_suffix(".txt"))
-    write_json(payload, base_path.with_suffix(".json"))
-    # write_merge_txt(segments, base_path.with_name(base_path.stem + "_merge.txt"))  删除掉这行,这行不导出
-    write_merge_date_txt(segments, base_path.with_name(base_path.stem + "_merge.date.txt"))  # ✅ 新增这行
+    # write_merge_txt(segments, base_path.with_name(base_path.stem + "_merge.txt"))    全部给注释掉,应该是没用的.
+
 
 
 def process_one(file_path: Path, args, pipe: InferencePipeline) -> Tuple[Path, bool, str]:
     try:
-        # 统一基准路径（不带后缀）
+        # 只构造 merge.txt 的目标路径
         base_path = mirror_output_path(args.input, args.output, file_path, ".srt").with_suffix("")
-        srt_path   = base_path.with_suffix(".srt")
-        txt_path   = base_path.with_suffix(".txt")
-        json_path  = base_path.with_suffix(".json")
-        merge_path = base_path.with_name(base_path.stem + "_merge.txt")
-        mdate_path = base_path.with_name(base_path.stem + "_merge.date.txt")
+        mdate_path = base_path.with_name(base_path.stem + "_merge.txt")
+        tmp_work = mdate_path.parent / "__tmp__"
+        mdate_path.parent.mkdir(parents=True, exist_ok=True)
 
-        tmp_work = srt_path.parent / "__tmp__"
-        srt_path.parent.mkdir(parents=True, exist_ok=True)
-
-        # 选择要写的输出
-        wanted = select_outputs(args)
-        path_map = {
-            "srt": srt_path,
-            "txt": txt_path,
-            "json": json_path,
-            "merge": merge_path,
-            "merge_date": mdate_path,
-        }
-
-        # 跳过已存在：只检查“需要写”的那些
-        need_paths = [path_map[k] for k in wanted]
-        if not args.overwrite and need_paths and all(p.exists() for p in need_paths):
-            return (need_paths[0], True, "skip-exist")
-
+        # 跳过已存在：只看 merge.txt
+        if not args.overwrite and mdate_path.exists():
+            return (mdate_path, True, "skip-exist")
         # 准备音频
         prepared = ensure_wav(file_path, tmp_work)
-
         # 推理
         result = pipe.transcribe(prepared)
-
-        # 按需写入
         segments = result.get("segments", [])
-        if "srt" in wanted:
-            write_srt(segments, srt_path)
-        if "txt" in wanted:
-            write_txt(result.get("text", ""), txt_path)
-        if "json" in wanted:
-            write_json(result, json_path)
-        # if "merge" in wanted:   注释掉
-            # write_merge_txt(segments, merge_path)
-        if "merge_date" in wanted:
-            write_merge_date_txt(segments, mdate_path)
 
+        # 只写 merge.txt  
+        write_merge_txt(segments, mdate_path)
         # 清理临时
         if prepared != file_path and prepared.name.endswith(".__tmp__.wav"):
             try:
@@ -262,15 +173,12 @@ def process_one(file_path: Path, args, pipe: InferencePipeline) -> Tuple[Path, b
                     shutil.rmtree(tmp_work, ignore_errors=True)
             except Exception:
                 pass
-
-        # 返回任意一个“需要写入”的路径，便于打印
-        first_out = need_paths[0] if need_paths else srt_path
-        return (first_out, True, "ok")
-
+        return (mdate_path, True, "ok")
     except subprocess.CalledProcessError as e:
         return (file_path, False, f"ffmpeg-fail: {e}")
     except Exception as e:
         return (file_path, False, f"infer-fail: {e}")
+
 
 
 
@@ -293,7 +201,6 @@ def main():
     parser.add_argument("--recursive", action="store_true")
     parser.add_argument("--workers", type=int, default=1, help="并发数（GPU 建议 1）")
     parser.add_argument("--overwrite", action="store_true")
-    parser.add_argument("--only-merge-date", action="store_true", help="仅导出 *_merge.date.txt，跳过 srt/txt/json/merge.txt")
     args = parser.parse_args()
 
     args.input = args.input.resolve()
