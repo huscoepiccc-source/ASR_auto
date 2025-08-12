@@ -86,10 +86,14 @@ def write_merge_txt(segments: List[Dict[str, Any]], out_path: Path):
     lines = []
     for seg in segments:
         speaker = seg.get("speaker", "")
-        spk_prefix = f"{speaker}: " if speaker else ""
         text = seg.get("text", "")
-        lines.append(f"{spk_prefix}{text}".strip())
+        # 强制使用 speaker 前缀
+        if speaker != "":
+            lines.append(f"speaker {speaker}")
+        lines.append(text.strip())
+        lines.append("")  # 添加空行分隔
     out_path.write_text("\n".join(lines), encoding="utf-8")
+
 
 def mirror_output_path(input_base: Path, output_base: Path, file_path: Path, suffix: str) -> Path:
     rel = file_path.relative_to(input_base)
