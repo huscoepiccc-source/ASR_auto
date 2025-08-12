@@ -217,10 +217,9 @@ def main():
     parser.add_argument("--model-dir", type=str, default=None, help="本地模型缓存/权重目录（离线）")
     parser.add_argument("--device", type=str, default="cuda", choices=["cuda", "cpu"])
     parser.add_argument("--no-diarize", action="store_true")
-    parser.add_argument("--recursive", action="store_true")
+    parser.add_argument("--recursive", action="store_true", default=True, help="递归扫描子目录（默认开启）")
     parser.add_argument("--workers", type=int, default=1, help="并发数（GPU 建议 1）")
     parser.add_argument("--overwrite", action="store_true")
-    parser.add_argument("--recursive", action="store_true", default=True, help="递归扫描子目录（默认开启）")
     parser.add_argument("--inplace", action="store_true", default=True, help="在源文件所在目录生成输出（默认开启）")
     args = parser.parse_args()
 
