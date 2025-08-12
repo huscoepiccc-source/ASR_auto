@@ -82,17 +82,81 @@ def write_txt(full_text: str, out_path: Path):
 def write_json(payload: Dict[str, Any], out_path: Path):
     out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
-def write_merge_txt(segments: List[Dict[str, Any]], out_path: Path):
-    lines = []
+def write_merge_txt(segments: List[Dict[str, Any]], out_path: Path, min_chars: int = 200, max_chars: int = 250):
+    """
+    将相邻同一说话人的片段合并成段；若一段过长，以句号“。”优先切分，每段控制在 200–250 字。
+    输出格式：
+    speaker 0
+    这一段合并后的文本（可被拆成多个 200-250 字段落，每段之间空一行）
+
+    speaker 1
+    ...
+    """
+    def split_into_paragraphs(text: str) -> List[str]:
+        # 保留句号作为边界；按“。”拆句，再按 min/max 长度聚合
+        sentences = []
+        buf = []
+        for ch in text:
+            buf.append(ch)
+            if ch == "。":
+                s = "".join(buf).strip()
+                if s:
+                    sentences.append(s)
+                buf = []
+        tail = "".join(buf).strip()
+        if tail:
+            sentences.append(tail)
+
+        paras = []
+        cur = ""
+        for s in sentences:
+            if not cur:
+                cur = s
+                continue
+            # 若当前段不足 min_chars，则尽量继续累加；超过 max_chars 就换段
+            if len(cur) < min_chars or (len(cur) + len(s) <= max_chars):
+                cur += s
+            else:
+                paras.append(cur)
+                cur = s
+        if cur:
+            paras.append(cur)
+        return paras
+
+    lines: List[str] = []
+    last_speaker = None
+    buffer = []
+
+    def flush_block():
+        nonlocal buffer, last_speaker
+        if not buffer:
+            return
+        block_text = "".join(buffer).strip()
+        if block_text:
+            lines.append(f"speaker {last_speaker}")
+            for para in split_into_paragraphs(block_text):
+                # 段落正文
+                lines.append(para.strip())
+                # 段落间空一行
+                lines.append("")
+        buffer = []
+
     for seg in segments:
-        speaker = seg.get("speaker", "")
-        text = seg.get("text", "")
-        # 强制使用 speaker 前缀
-        if speaker != "":
-            lines.append(f"speaker {speaker}")
-        lines.append(text.strip())
-        lines.append("")  # 添加空行分隔
-    out_path.write_text("\n".join(lines), encoding="utf-8")
+        spk = seg.get("speaker", "UNK")  # 可能是 int/str，都允许
+        text = (seg.get("text", "") or "").strip()
+        # 碰到新说话人，先冲刷上一位说话人的合并段
+        if last_speaker is None:
+            last_speaker = spk
+        if spk != last_speaker:
+            flush_block()
+            last_speaker = spk
+        buffer.append(text)
+
+    # 冲刷最后一段
+    flush_block()
+
+    out = "\n".join(lines).rstrip() + "\n"
+    out_path.write_text(out, encoding="utf-8")
 
 
 def mirror_output_path(input_base: Path, output_base: Path, file_path: Path, suffix: str) -> Path:
@@ -134,10 +198,10 @@ def process_one(file_path: Path, args, pipe: InferencePipeline) -> Tuple[Path, b
         result = pipe.transcribe(prepared)
 
         # 写结果
-        write_srt(result.get("segments", []), srt_path)
-        write_txt(result.get("text", ""), txt_path)
-        write_json(result, json_path)
-        from segment_merger import write_merge_file
+        # write_srt(result.get("segments", []), srt_path)  # 这三行 与下面write_all_outputs 重复
+        # write_txt(result.get("text", ""), txt_path)
+        # write_json(result, json_path)
+        # from segment_merger import write_merge_file     不再需要这个模块了
         # 统一写入所有输出格式（含 merge.txt）
         base_path = mirror_output_path(args.input, args.output, file_path, ".srt").with_suffix("")
         write_all_outputs(result, base_path)
