@@ -24,7 +24,7 @@ VENV_PY = PROJECT_ROOT / "asr_env" / "Scripts" / "python.exe"
 #            return p
 #    return None
 
-BATCH_RUNNER = find_batch_runner()
+#BATCH_RUNNER = find_batch_runner()
 
 # 可选：默认的 model-dir（按你的离线缓存相对位置）
 DEFAULT_MODEL_DIR = PROJECT_ROOT / "asr_env" / ".cache" / "modelscope" / "hub" / "iic"
