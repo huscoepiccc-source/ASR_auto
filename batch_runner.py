@@ -198,7 +198,7 @@ def write_all_outputs(result: Dict[str, Any], base_path: Path):
     write_srt(segments, base_path.with_suffix(".srt"))
     write_txt(full_text, base_path.with_suffix(".txt"))
     write_json(payload, base_path.with_suffix(".json"))
-    write_merge_txt(segments, base_path.with_name(base_path.stem + "_merge.txt"))
+    # write_merge_txt(segments, base_path.with_name(base_path.stem + "_merge.txt"))  删除掉这行,这行不导出
     write_merge_date_txt(segments, base_path.with_name(base_path.stem + "_merge.date.txt"))  # ✅ 新增这行
 
 
