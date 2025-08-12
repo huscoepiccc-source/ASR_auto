@@ -82,18 +82,19 @@ def write_txt(full_text: str, out_path: Path):
 def write_json(payload: Dict[str, Any], out_path: Path):
     out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
-def write_merge_txt(segments: List[Dict[str, Any]], out_path: Path, min_chars: int = 200, max_chars: int = 250):
-    """
-    将相邻同一说话人的片段合并成段；若一段过长，以句号“。”优先切分，每段控制在 200–250 字。
-    输出格式：
-    speaker 0
-    这一段合并后的文本（可被拆成多个 200-250 字段落，每段之间空一行）
+def format_hms(t: float) -> str:
+    # 时间戳格式化为 00:00:00
+    h, rem = divmod(int(t), 3600)
+    m, rem = divmod(rem, 60)
+    s = int(rem)
+    return f"{h:02d}:{m:02d}:{s:02d}"
 
-    speaker 1
-    ...
-    """
-    def split_into_paragraphs(text: str) -> List[str]:
-        # 保留句号作为边界；按“。”拆句，再按 min/max 长度聚合
+def write_merge_date_txt(segments: List[Dict[str, Any]], out_path: Path, min_chars: int = 200, max_chars: int = 250):
+    def split_with_timestamps(text: str, start: float, end: float) -> List[Tuple[str, str, str]]:
+        """
+        将文本分割成 200–250 字左右的段落（按句号），并估算时间戳区间。
+        返回 [(start_str, end_str, text), ...]
+        """
         sentences = []
         buf = []
         for ch in text:
@@ -113,7 +114,6 @@ def write_merge_txt(segments: List[Dict[str, Any]], out_path: Path, min_chars: i
             if not cur:
                 cur = s
                 continue
-            # 若当前段不足 min_chars，则尽量继续累加；超过 max_chars 就换段
             if len(cur) < min_chars or (len(cur) + len(s) <= max_chars):
                 cur += s
             else:
@@ -121,42 +121,68 @@ def write_merge_txt(segments: List[Dict[str, Any]], out_path: Path, min_chars: i
                 cur = s
         if cur:
             paras.append(cur)
-        return paras
 
-    lines: List[str] = []
-    last_speaker = None
-    buffer = []
+        # 时间分段估算（线性均分）
+        total = len(paras)
+        t_start = float(start)
+        t_end = float(end)
+        t_step = (t_end - t_start) / max(total, 1)
+        out = []
+        for i, para in enumerate(paras):
+            ts_start = t_start + i * t_step
+            ts_end = ts_start + t_step
+            out.append((format_hms(ts_start), format_hms(ts_end), para.strip()))
+        return out
+
+    lines = []
+    last_spk = None
+    block_text = ""
+    block_start = None
+    block_end = None
 
     def flush_block():
-        nonlocal buffer, last_speaker
-        if not buffer:
+        nonlocal block_text, block_start, block_end, last_spk
+        if not block_text or block_start is None or block_end is None:
             return
-        block_text = "".join(buffer).strip()
-        if block_text:
-            lines.append(f"speaker {last_speaker}")
-            for para in split_into_paragraphs(block_text):
-                # 段落正文
-                lines.append(para.strip())
-                # 段落间空一行
-                lines.append("")
-        buffer = []
+        chunks = split_with_timestamps(block_text, block_start, block_end)
+        for i, (ts1, ts2, text) in enumerate(chunks):
+            lines.append(f"{ts1}-{ts2}")
+            # 第一段标注 speaker，后续分段仍保留 speaker
+            lines.append(f"speaker {last_spk}")
+            lines.append(text)
+            lines.append("")  # 段落间空行
+        block_text = ""
+        block_start = None
+        block_end = None
 
     for seg in segments:
-        spk = seg.get("speaker", "UNK")  # 可能是 int/str，都允许
-        text = (seg.get("text", "") or "").strip()
-        # 碰到新说话人，先冲刷上一位说话人的合并段
-        if last_speaker is None:
-            last_speaker = spk
-        if spk != last_speaker:
+        spk = seg.get("speaker", "UNK")
+        text = seg.get("text", "").strip()
+        start = float(seg.get("start", 0.0))
+        end = float(seg.get("end", 0.0))
+
+        if last_spk is None:
+            last_spk = spk
+            block_start = start
+            block_end = end
+            block_text = text
+            continue
+
+        if spk != last_spk:
             flush_block()
-            last_speaker = spk
-        buffer.append(text)
+            last_spk = spk
+            block_start = start
+            block_end = end
+            block_text = text
+        else:
+            # 累计时间和文本
+            block_text += text
+            block_end = end
 
-    # 冲刷最后一段
-    flush_block()
+    flush_block()  # 最后一段
 
-    out = "\n".join(lines).rstrip() + "\n"
-    out_path.write_text(out, encoding="utf-8")
+    out_path.write_text("\n".join(lines).strip() + "\n", encoding="utf-8")
+
 
 
 def mirror_output_path(input_base: Path, output_base: Path, file_path: Path, suffix: str) -> Path:
@@ -173,6 +199,7 @@ def write_all_outputs(result: Dict[str, Any], base_path: Path):
     write_txt(full_text, base_path.with_suffix(".txt"))
     write_json(payload, base_path.with_suffix(".json"))
     write_merge_txt(segments, base_path.with_name(base_path.stem + "_merge.txt"))
+    write_merge_date_txt(segments, base_path.with_name(base_path.stem + "_merge.date.txt"))  # ✅ 新增这行
 
 
 def process_one(file_path: Path, args, pipe: InferencePipeline) -> Tuple[Path, bool, str]:
