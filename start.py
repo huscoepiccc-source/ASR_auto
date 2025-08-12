@@ -5,37 +5,53 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
+
 # ========== 项目相对路径探测 ==========
 PROJECT_ROOT = Path(__file__).resolve().parent
 
 # 虚拟环境 python.exe（Windows）
 VENV_PY = PROJECT_ROOT / "asr_env" / "Scripts" / "python.exe"
 
-# batch_runner.py 位置（兼容 executive / excutive）
-def find_batch_runner():
-    candidates = [
-        PROJECT_ROOT / "executive" / "batch_runner.py",
-        PROJECT_ROOT / "excutive" / "batch_runner.py",
-        PROJECT_ROOT / "batch_runner.py",  # 兜底：就在根目录的情况
-    ]
-    for p in candidates:
-        if p.exists():
-            return p
-    return None
+# batch_runner.py 位置（兼容 executive / excutive）      # 初版的,现在给注释掉了
+#def find_batch_runner():
+#    candidates = [
+#        PROJECT_ROOT / "executive" / "batch_runner.py",
+#        PROJECT_ROOT / "excutive" / "batch_runner.py",
+#        PROJECT_ROOT / "batch_runner.py",  # 兜底：就在根目录的情况
+#    ]
+#    for p in candidates:
+#        if p.exists():
+#            return p
+#    return None
 
 BATCH_RUNNER = find_batch_runner()
 
 # 可选：默认的 model-dir（按你的离线缓存相对位置）
 DEFAULT_MODEL_DIR = PROJECT_ROOT / "asr_env" / ".cache" / "modelscope" / "hub" / "iic"
 
+SCRIPT_OPTIONS = {
+    "txt类型_有date": "batch_runner_merge.date.txt.py",
+    "txt类型_无date": "batch_runner_merge.txt.py",
+    "md_v1_No_format": "batch_runner_merge.md_v1_No_format.py",
+    "md_v2_Md_format": "batch_runner_merge.md_v2_Md_format.py",
+    "srt,merge.txt": "batch_runner_srt,merge.txt.py",
+}
 
 # ========== GUI ==========
+
 
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("批量转录启动器")
         self.geometry("700x260")
+
+        # 添加在设备选择之上，例如 row=3 替换为 row=2.5
+        tk.Label(self, text="转录格式选择:").grid(row=3, column=0, sticky="e", padx=8, pady=8)
+        self.script_var = tk.StringVar(value=list(SCRIPT_OPTIONS.keys())[0])  # 默认第一个格式
+        format_menu = tk.OptionMenu(self, self.script_var, *SCRIPT_OPTIONS.keys())
+        format_menu.config(width=20)
+        format_menu.grid(row=3, column=1, sticky="w", padx=8, pady=8)
 
         # 输入目录
         tk.Label(self, text="输入目录:").grid(row=0, column=0, sticky="e", padx=8, pady=8)
@@ -78,17 +94,17 @@ class App(tk.Tk):
         # 约束列权重让中间列伸缩
         self.grid_columnconfigure(1, weight=1)
 
-        # 预运行检查
-        self.preflight_check()
+        # 预运行检查     之前的版本的,现在已经注释掉
+        # self.preflight_check()
 
-    def preflight_check(self):
-        missing = []
-        if not VENV_PY.exists():
-            missing.append(f"未找到虚拟环境 Python: {VENV_PY}")
-        if BATCH_RUNNER is None:
-            missing.append("未找到 batch_runner.py（尝试了 executive/、excutive/、项目根目录）")
-        if missing:
-            messagebox.showerror("环境检查失败", "\n".join(missing))
+    # def preflight_check(self):
+        #missing = []
+        #if not VENV_PY.exists():
+            #missing.append(f"未找到虚拟环境 Python: {VENV_PY}")
+        #if BATCH_RUNNER is None:
+            #missing.append("未找到 batch_runner.py（尝试了 executive/、excutive/、项目根目录）")
+        #if missing:
+            #messagebox.showerror("环境检查失败", "\n".join(missing))
 
     def choose_input(self):
         d = filedialog.askdirectory(title="选择音视频所在的输入目录")
@@ -119,7 +135,17 @@ class App(tk.Tk):
             return
 
         # 组装命令行参数
-        cmd = [str(VENV_PY), str(BATCH_RUNNER), "--input", input_dir]
+        # cmd = [str(VENV_PY), str(BATCH_RUNNER), "--input", input_dir]   旧的,注释掉
+        # 获取当前选中的脚本文件名
+        selected_name = self.script_var.get()
+        script_filename = SCRIPT_OPTIONS.get(selected_name)
+        runner_path = PROJECT_ROOT / "executive" / script_filename
+        if not runner_path.exists():
+            messagebox.showerror("脚本不存在", f"找不到脚本文件:\n{runner_path}")
+            return
+        cmd = [str(VENV_PY), str(runner_path), "--input", input_dir]
+
+
 
         output_dir = self.output_var.get().strip()
         if output_dir:
