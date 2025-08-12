@@ -131,6 +131,17 @@ def write_merge_txt(segments: List[Dict[str, Any]], out_path: Path, min_chars: i
     out = "\n".join(lines).rstrip() + "\n"
     out_path.write_text(out, encoding="utf-8")
 
+def out_path_merge_inplace(file_path: Path) -> Path:
+    """在源目录就地生成 *_merge.txt"""
+    return file_path.with_name(file_path.stem + "_merge.txt")
+
+def out_path_merge_mirror(input_base: Path, output_base: Path, file_path: Path) -> Path:
+    """在输出根路径进行目录镜像，生成 *_merge.txt"""
+    rel = file_path.relative_to(input_base)
+    target = output_base / rel
+    return target.with_name(target.stem + "_merge.txt")
+
+
 
 def mirror_output_path(input_base: Path, output_base: Path, file_path: Path, suffix: str) -> Path:
     rel = file_path.relative_to(input_base)
@@ -144,27 +155,34 @@ def mirror_output_path(input_base: Path, output_base: Path, file_path: Path, suf
 
     # write_merge_txt(segments, base_path.with_name(base_path.stem + "_merge.txt"))    全部给注释掉,应该是没用的.
 
-
-
 def process_one(file_path: Path, args, pipe: InferencePipeline) -> Tuple[Path, bool, str]:
+    """
+    只输出 *_merge.txt；存在则跳过；支持就地输出或镜像输出
+    """
     try:
-        # 只构造 merge.txt 的目标路径
-        base_path = mirror_output_path(args.input, args.output, file_path, ".srt").with_suffix("")
-        mdate_path = base_path.with_name(base_path.stem + "_merge.txt")
-        tmp_work = mdate_path.parent / "__tmp__"
-        mdate_path.parent.mkdir(parents=True, exist_ok=True)
+        # 目标输出路径
+        if args.inplace:
+            merge_path = out_path_merge_inplace(file_path)
+        else:
+            merge_path = out_path_merge_mirror(args.input, args.output, file_path)
 
-        # 跳过已存在：只看 merge.txt
-        if not args.overwrite and mdate_path.exists():
-            return (mdate_path, True, "skip-exist")
-        # 准备音频
+        tmp_work = merge_path.parent / "__tmp__"
+        merge_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # 跳过已存在
+        if not args.overwrite and merge_path.exists():
+            return (merge_path, True, "skip-exist")
+
+        # 准备音频（视频自动抽音轨）
         prepared = ensure_wav(file_path, tmp_work)
+
         # 推理
         result = pipe.transcribe(prepared)
         segments = result.get("segments", [])
 
-        # 只写 merge.txt  
-        write_merge_txt(segments, mdate_path)
+        # 写入 merge.txt（按你已有的合并逻辑）
+        write_merge_txt(segments, merge_path)
+
         # 清理临时
         if prepared != file_path and prepared.name.endswith(".__tmp__.wav"):
             try:
@@ -173,12 +191,13 @@ def process_one(file_path: Path, args, pipe: InferencePipeline) -> Tuple[Path, b
                     shutil.rmtree(tmp_work, ignore_errors=True)
             except Exception:
                 pass
-        return (mdate_path, True, "ok")
+
+        return (merge_path, True, "ok")
+
     except subprocess.CalledProcessError as e:
         return (file_path, False, f"ffmpeg-fail: {e}")
     except Exception as e:
         return (file_path, False, f"infer-fail: {e}")
-
 
 
 
@@ -194,13 +213,15 @@ def collect_files(input_dir: Path, recursive: bool) -> List[Path]:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=Path, default=Path(r"C:\Users\Administrator\Downloads\input"))
-    parser.add_argument("--output", type=Path, default=Path(r"C:\Users\Administrator\Downloads\output"))
+    parser.add_argument("--output", type=Path, default=Path(r"C:\Users\Administrator\Downloads\output"))  # 这个还需要吗?
     parser.add_argument("--model-dir", type=str, default=None, help="本地模型缓存/权重目录（离线）")
     parser.add_argument("--device", type=str, default="cuda", choices=["cuda", "cpu"])
     parser.add_argument("--no-diarize", action="store_true")
     parser.add_argument("--recursive", action="store_true")
     parser.add_argument("--workers", type=int, default=1, help="并发数（GPU 建议 1）")
     parser.add_argument("--overwrite", action="store_true")
+    parser.add_argument("--recursive", action="store_true", default=True, help="递归扫描子目录（默认开启）")
+    parser.add_argument("--inplace", action="store_true", default=True, help="在源文件所在目录生成输出（默认开启）")
     args = parser.parse_args()
 
     args.input = args.input.resolve()
