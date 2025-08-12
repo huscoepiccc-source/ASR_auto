@@ -91,6 +91,11 @@ def write_merge_txt(segments: List[Dict[str, Any]], out_path: Path):
         lines.append(f"{spk_prefix}{text}".strip())
     out_path.write_text("\n".join(lines), encoding="utf-8")
 
+def mirror_output_path(input_base: Path, output_base: Path, file_path: Path, suffix: str) -> Path:
+    rel = file_path.relative_to(input_base)
+    target = output_base / rel
+    return target.with_suffix(suffix)
+
 def write_all_outputs(result: Dict[str, Any], base_path: Path):
     segments = result.get("segments", [])
     full_text = result.get("text", "")
