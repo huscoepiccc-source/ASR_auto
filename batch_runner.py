@@ -12,6 +12,11 @@ SUPPORTED_AUDIO = {".wav", ".mp3", ".m4a", ".flac", ".aac", ".ogg", ".wma"}
 SUPPORTED_VIDEO = {".mp4", ".mkv", ".mov", ".avi", ".flv", ".webm"}
 SUPPORTED_ALL = SUPPORTED_AUDIO | SUPPORTED_VIDEO
 
+def select_outputs(args) -> set[str]:
+    if getattr(args, "only_merge_date", False):
+        return {"merge_date"}
+    # 默认全量（你也可以自定义）
+    return {"srt", "txt", "json", "merge", "merge_date"}
 
 def has_ffmpeg() -> bool:
     try:
@@ -203,20 +208,32 @@ def write_all_outputs(result: Dict[str, Any], base_path: Path):
 
 
 def process_one(file_path: Path, args, pipe: InferencePipeline) -> Tuple[Path, bool, str]:
-    """
-    返回：(srt_path, success, msg)
-    """
     try:
-        # 输出路径（同名不同后缀）
-        srt_path = mirror_output_path(args.input, args.output, file_path, ".srt")
-        txt_path = mirror_output_path(args.input, args.output, file_path, ".txt")
-        json_path = mirror_output_path(args.input, args.output, file_path, ".json")
+        # 统一基准路径（不带后缀）
+        base_path = mirror_output_path(args.input, args.output, file_path, ".srt").with_suffix("")
+        srt_path   = base_path.with_suffix(".srt")
+        txt_path   = base_path.with_suffix(".txt")
+        json_path  = base_path.with_suffix(".json")
+        merge_path = base_path.with_name(base_path.stem + "_merge.txt")
+        mdate_path = base_path.with_name(base_path.stem + "_merge.date.txt")
+
         tmp_work = srt_path.parent / "__tmp__"
         srt_path.parent.mkdir(parents=True, exist_ok=True)
 
-        # 跳过已存在（可通过 --overwrite 控制）
-        if not args.overwrite and srt_path.exists() and txt_path.exists() and json_path.exists():
-            return (srt_path, True, "skip-exist")
+        # 选择要写的输出
+        wanted = select_outputs(args)
+        path_map = {
+            "srt": srt_path,
+            "txt": txt_path,
+            "json": json_path,
+            "merge": merge_path,
+            "merge_date": mdate_path,
+        }
+
+        # 跳过已存在：只检查“需要写”的那些
+        need_paths = [path_map[k] for k in wanted]
+        if not args.overwrite and need_paths and all(p.exists() for p in need_paths):
+            return (need_paths[0], True, "skip-exist")
 
         # 准备音频
         prepared = ensure_wav(file_path, tmp_work)
@@ -224,14 +241,18 @@ def process_one(file_path: Path, args, pipe: InferencePipeline) -> Tuple[Path, b
         # 推理
         result = pipe.transcribe(prepared)
 
-        # 写结果
-        # write_srt(result.get("segments", []), srt_path)  # 这三行 与下面write_all_outputs 重复
-        # write_txt(result.get("text", ""), txt_path)
-        # write_json(result, json_path)
-        # from segment_merger import write_merge_file     不再需要这个模块了
-        # 统一写入所有输出格式（含 merge.txt）
-        base_path = mirror_output_path(args.input, args.output, file_path, ".srt").with_suffix("")
-        write_all_outputs(result, base_path)
+        # 按需写入
+        segments = result.get("segments", [])
+        if "srt" in wanted:
+            write_srt(segments, srt_path)
+        if "txt" in wanted:
+            write_txt(result.get("text", ""), txt_path)
+        if "json" in wanted:
+            write_json(result, json_path)
+        # if "merge" in wanted:   注释掉
+            # write_merge_txt(segments, merge_path)
+        if "merge_date" in wanted:
+            write_merge_date_txt(segments, mdate_path)
 
         # 清理临时
         if prepared != file_path and prepared.name.endswith(".__tmp__.wav"):
@@ -242,11 +263,15 @@ def process_one(file_path: Path, args, pipe: InferencePipeline) -> Tuple[Path, b
             except Exception:
                 pass
 
-        return (srt_path, True, "ok")
+        # 返回任意一个“需要写入”的路径，便于打印
+        first_out = need_paths[0] if need_paths else srt_path
+        return (first_out, True, "ok")
+
     except subprocess.CalledProcessError as e:
         return (file_path, False, f"ffmpeg-fail: {e}")
     except Exception as e:
         return (file_path, False, f"infer-fail: {e}")
+
 
 
 def collect_files(input_dir: Path, recursive: bool) -> List[Path]:
@@ -268,6 +293,7 @@ def main():
     parser.add_argument("--recursive", action="store_true")
     parser.add_argument("--workers", type=int, default=1, help="并发数（GPU 建议 1）")
     parser.add_argument("--overwrite", action="store_true")
+    parser.add_argument("--only-merge-date", action="store_true", help="仅导出 *_merge.date.txt，跳过 srt/txt/json/merge.txt")
     args = parser.parse_args()
 
     args.input = args.input.resolve()
