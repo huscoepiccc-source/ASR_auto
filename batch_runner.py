@@ -132,14 +132,14 @@ def write_merge_txt(segments: List[Dict[str, Any]], out_path: Path, min_chars: i
     out_path.write_text(out, encoding="utf-8")
 
 def out_path_merge_inplace(file_path: Path) -> Path:
-    """在源目录就地生成 *_merge.txt"""
-    return file_path.with_name(file_path.stem + "_merge.txt")
+    """在源目录就地生成 *_merge.md"""
+    return file_path.with_name(file_path.stem + "_merge.md")
 
 def out_path_merge_mirror(input_base: Path, output_base: Path, file_path: Path) -> Path:
-    """在输出根路径进行目录镜像，生成 *_merge.txt"""
+    """在输出根路径进行目录镜像，生成 *_merge.md"""
     rel = file_path.relative_to(input_base)
     target = output_base / rel
-    return target.with_name(target.stem + "_merge.txt")
+    return target.with_name(target.stem + "_merge.md")
 
 
 
