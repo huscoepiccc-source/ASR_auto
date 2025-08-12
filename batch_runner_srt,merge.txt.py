@@ -54,7 +54,35 @@ def ensure_wav(input_path: Path, work_dir: Path) -> Path:
     subprocess.run(cmd, check=True)
     return out
 
-# def write_merge_txt(segments: List[Dict[str, Any]], out_path: Path, min_chars: int = 200, max_chars: int = 250):  # txt 导出,此处注释掉,便于更替
+
+def format_srt_time(t: float) -> str:
+    ms = int(round(t * 1000))
+    h, rem = divmod(ms, 3600000)
+    m, rem = divmod(rem, 60000)
+    s, ms = divmod(rem, 1000)
+    return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
+
+def write_srt(segments: List[Dict[str, Any]], out_path: Path):
+    lines = []
+    for i, seg in enumerate(segments, start=1):
+        start = format_srt_time(float(seg.get("start", 0.0)))
+        end = format_srt_time(float(seg.get("end", 0.0)))
+        speaker = seg.get("speaker", "")
+        spk_prefix = f"{speaker}: " if speaker else ""
+        text = seg.get("text", "")
+        lines.append(f"{i}")
+        lines.append(f"{start} --> {end}")
+        lines.append(f"{spk_prefix}{text}".strip())
+        lines.append("")
+    out_path.write_text("\n".join(lines), encoding="utf-8")
+
+def write_txt(full_text: str, out_path: Path):
+    out_path.write_text(full_text.strip() + "\n", encoding="utf-8")
+
+def write_json(payload: Dict[str, Any], out_path: Path):
+    out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+def write_merge_txt(segments: List[Dict[str, Any]], out_path: Path, min_chars: int = 200, max_chars: int = 250):
     """
     将相邻同一说话人的片段合并成段；若一段过长，以句号“。”优先切分，每段控制在 200–250 字。
     输出格式：
@@ -130,104 +158,15 @@ def ensure_wav(input_path: Path, work_dir: Path) -> Path:
     out = "\n".join(lines).rstrip() + "\n"
     out_path.write_text(out, encoding="utf-8")
 
-def write_merge_markdown(
-    segments: List[Dict[str, Any]],
-    out_path: Path,
-    min_chars: int = 200,
-    max_chars: int = 250,
-    frontmatter: str | None = None,
-    heading_level: int = 3
-):
-    """
-    连续同一说话人合并；按“。”+长度在 200–250 字分段；渲染成 Markdown。
-    - 每个说话人块使用 Markdown 标题（默认 ### speaker X）
-    - 段落之间空一行
-    - 可选 frontmatter（YAML），用于 Obsidian
-    """
-    def split_into_paragraphs(text: str) -> List[str]:
-        # 与你当前 write_merge_txt 完全一致的分段逻辑
-        sentences = []
-        buf = []
-        for ch in text:
-            buf.append(ch)
-            if ch == "。":
-                s = "".join(buf).strip()
-                if s:
-                    sentences.append(s)
-                buf = []
-        tail = "".join(buf).strip()
-        if tail:
-            sentences.append(tail)
-
-        paras = []
-        cur = ""
-        for s in sentences:
-            if not cur:
-                cur = s
-                continue
-            if len(cur) < min_chars or (len(cur) + len(s) <= max_chars):
-                cur += s
-            else:
-                paras.append(cur)
-                cur = s
-        if cur:
-            paras.append(cur)
-        return paras
-
-    lines: List[str] = []
-
-    # 可选：Obsidian frontmatter
-    if frontmatter:
-        lines.append(frontmatter.rstrip())
-        lines.append("")
-
-    last_speaker = None
-    buffer: List[str] = []
-
-    def flush_block():
-        nonlocal buffer, last_speaker
-        if not buffer:
-            return
-        block_text = "".join(buffer).strip()
-        if block_text:
-            # Markdown 标题（### speaker X）
-            h = "#" * max(1, int(heading_level))
-            lines.append(f"{h} speaker {last_speaker}")
-            lines.append("")  # 标题与正文之间空一行
-            for para in split_into_paragraphs(block_text):
-                lines.append(para.strip())
-                lines.append("")  # 段落间空一行
-        buffer = []
-
-    for seg in segments:
-        spk = seg.get("speaker", "UNK")
-        text = (seg.get("text", "") or "").strip()
-
-        if last_speaker is None:
-            last_speaker = spk
-
-        if spk != last_speaker:
-            flush_block()
-            last_speaker = spk
-
-        buffer.append(text)
-
-    flush_block()
-
-    out = "\n".join(lines).rstrip() + "\n"
-    out_path.write_text(out, encoding="utf-8")
-
-
 def out_path_merge_inplace(file_path: Path) -> Path:
-    """在源目录就地生成 *_merge.md"""
-    return file_path.with_name(file_path.stem + "_merge.md")
+    """在源目录就地生成 *_merge.txt"""
+    return file_path.with_name(file_path.stem + "_merge.txt")
 
 def out_path_merge_mirror(input_base: Path, output_base: Path, file_path: Path) -> Path:
-    """在输出根路径进行目录镜像，生成 *_merge.md"""
+    """在输出根路径进行目录镜像，生成 *_merge.txt"""
     rel = file_path.relative_to(input_base)
     target = output_base / rel
-    return target.with_name(target.stem + "_merge.md")
-
+    return target.with_name(target.stem + "_merge.txt")
 
 
 def mirror_output_path(input_base: Path, output_base: Path, file_path: Path, suffix: str) -> Path:
@@ -236,47 +175,67 @@ def mirror_output_path(input_base: Path, output_base: Path, file_path: Path, suf
     return target.with_suffix(suffix)
 
 def write_all_outputs(result: Dict[str, Any], base_path: Path):
-    # segments = result.get("segments", [])    导出txt 用的四行,这里先给注释掉
-    # full_text = result.get("text", "")
-    # payload = result
-    # write_merge_txt(segments, base_path.with_name(base_path.stem + "_merge.md"))    
-    
     segments = result.get("segments", [])
-    md_path = file_path.with_name(file_path.stem + "_merge.md")
-    # 可选 frontmatter（Obsidian）
-    fm = f"---\ntitle: {file_path.stem}\nsource: {file_path.name}\n---"
-    write_merge_markdown(segments, md_path, frontmatter=fm, heading_level=3)
+    full_text = result.get("text", "")
+    payload = result
+
+    write_srt(segments, base_path.with_suffix(".srt"))
+    write_txt(full_text, base_path.with_suffix(".txt"))
+    write_json(payload, base_path.with_suffix(".json"))
+    write_merge_txt(segments, base_path.with_name(base_path.stem + "_merge.txt"))
 
 
 def process_one(file_path: Path, args, pipe: InferencePipeline) -> Tuple[Path, bool, str]:
     """
-    只输出 *_merge.txt；存在则跳过；支持就地输出或镜像输出
+    返回：(srt_path, success, msg)
     """
     try:
+        # 输出路径（同名不同后缀）
+        # srt_path = mirror_output_path(args.input, args.output, file_path, ".srt")
+        # txt_path = mirror_output_path(args.input, args.output, file_path, ".txt")
+        # json_path = mirror_output_path(args.input, args.output, file_path, ".json")
+        # tmp_work = srt_path.parent / "__tmp__"
+        # srt_path.parent.mkdir(parents=True, exist_ok=True)
         # 目标输出路径
         if args.inplace:
             merge_path = out_path_merge_inplace(file_path)
         else:
             merge_path = out_path_merge_mirror(args.input, args.output, file_path)
+        if args.inplace:
+            srt_path  = out_path_srt_inplace(file_path)
+        else:
+            srt_path = out_path_srt_mirror(args.input, args.output, file_path)
+        if args.inplace:
+            txt_path = out_path_txt_inplace(file_path)
+        else:
+            txt_path = out_path_txt_mirror(args.input, args.output, file_path)
+        if args.inplace:
+            json_path = out_path_json_inplace(file_path)
+        else:
+            json_path = out_path_json_mirror(args.input, args.output, file_path)
+
 
         tmp_work = merge_path.parent / "__tmp__"
         merge_path.parent.mkdir(parents=True, exist_ok=True)
 
-        # 跳过已存在
-        if not args.overwrite and merge_path.exists():   #导出merge.txt用的,可以注释掉,但保留着也没有事
-            return (merge_path, True, "skip-exist")            #导出merge.txt用的,可以注释掉,但保留着也没有事
-        if not args.overwrite and md_path.exists():
-            return (md_path, True, "skip-exist")
+        # 跳过已存在（可通过 --overwrite 控制）
+        if not args.overwrite and srt_path.exists() and txt_path.exists() and json_path.exists():
+            return (srt_path, True, "skip-exist")
 
-        # 准备音频（视频自动抽音轨）
+        # 准备音频
         prepared = ensure_wav(file_path, tmp_work)
 
         # 推理
         result = pipe.transcribe(prepared)
-        segments = result.get("segments", [])
 
-        # 写入 merge.txt（按你已有的合并逻辑）
-        write_merge_txt(segments, merge_path)
+        # 写结果
+        # write_srt(result.get("segments", []), srt_path)  # 这三行 与下面write_all_outputs 重复
+        # write_txt(result.get("text", ""), txt_path)
+        # write_json(result, json_path)
+        # from segment_merger import write_merge_file     不再需要这个模块了
+        # 统一写入所有输出格式（含 merge.txt）
+        base_path = mirror_output_path(args.input, args.output, file_path, ".srt").with_suffix("")
+        write_all_outputs(result, base_path)
 
         # 清理临时
         if prepared != file_path and prepared.name.endswith(".__tmp__.wav"):
@@ -287,13 +246,11 @@ def process_one(file_path: Path, args, pipe: InferencePipeline) -> Tuple[Path, b
             except Exception:
                 pass
 
-        return (merge_path, True, "ok")
-
+        return (srt_path, True, "ok")
     except subprocess.CalledProcessError as e:
         return (file_path, False, f"ffmpeg-fail: {e}")
     except Exception as e:
         return (file_path, False, f"infer-fail: {e}")
-
 
 
 def collect_files(input_dir: Path, recursive: bool) -> List[Path]:
@@ -308,15 +265,14 @@ def collect_files(input_dir: Path, recursive: bool) -> List[Path]:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=Path, default=Path(r"C:\Users\Administrator\Downloads\input"))
-    parser.add_argument("--output", type=Path, default=Path(r"C:\Users\Administrator\Downloads\output"), help="输出目录（仅在关闭 --inplace 时生效）")
+    parser.add_argument("--output", type=Path, default=Path(r"C:\Users\Administrator\Downloads\output"))
     parser.add_argument("--model-dir", type=str, default=None, help="本地模型缓存/权重目录（离线）")
     parser.add_argument("--device", type=str, default="cuda", choices=["cuda", "cpu"])
     parser.add_argument("--no-diarize", action="store_true")
     parser.add_argument("--recursive", action="store_true", default=True, help="递归扫描子目录（默认开启）")
+    parser.add_argument("--inplace", action="store_true", default=True, help="在源文件所在目录生成输出（默认开启）")
     parser.add_argument("--workers", type=int, default=1, help="并发数（GPU 建议 1）")
     parser.add_argument("--overwrite", action="store_true")
-    parser.add_argument("--inplace", action="store_true", default=True, help="在源文件所在目录生成输出（默认开启）")
-
     args = parser.parse_args()
 
     args.input = args.input.resolve()
