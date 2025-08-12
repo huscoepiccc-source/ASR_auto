@@ -148,12 +148,11 @@ def mirror_output_path(input_base: Path, output_base: Path, file_path: Path, suf
     target = output_base / rel
     return target.with_suffix(suffix)
 
-# def write_all_outputs(result: Dict[str, Any], base_path: Path):
-    # segments = result.get("segments", [])
-    # full_text = result.get("text", "")
-    # payload = result
-
-    # write_merge_txt(segments, base_path.with_name(base_path.stem + "_merge.txt"))    全部给注释掉,应该是没用的.
+def write_all_outputs(result: Dict[str, Any], base_path: Path):
+    segments = result.get("segments", [])
+    full_text = result.get("text", "")
+    payload = result
+    write_merge_txt(segments, base_path.with_name(base_path.stem + "_merge.md"))    
 
 def process_one(file_path: Path, args, pipe: InferencePipeline) -> Tuple[Path, bool, str]:
     """
@@ -213,7 +212,7 @@ def collect_files(input_dir: Path, recursive: bool) -> List[Path]:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=Path, default=Path(r"C:\Users\Administrator\Downloads\input"))
-    parser.add_argument("--output", type=Path, default=Path(r"C:\Users\Administrator\Downloads\output"))  # 这个还需要吗?
+    parser.add_argument("--output", type=Path, default=Path(r"C:\Users\Administrator\Downloads\output"), help="输出目录（仅在关闭 --inplace 时生效）")
     parser.add_argument("--model-dir", type=str, default=None, help="本地模型缓存/权重目录（离线）")
     parser.add_argument("--device", type=str, default="cuda", choices=["cuda", "cpu"])
     parser.add_argument("--no-diarize", action="store_true")
@@ -221,6 +220,7 @@ def main():
     parser.add_argument("--workers", type=int, default=1, help="并发数（GPU 建议 1）")
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--inplace", action="store_true", default=True, help="在源文件所在目录生成输出（默认开启）")
+
     args = parser.parse_args()
 
     args.input = args.input.resolve()
