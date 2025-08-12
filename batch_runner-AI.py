@@ -5,8 +5,8 @@ import shutil
 import subprocess
 from pathlib import Path
 from typing import List, Dict, Any, Tuple
-
 from pipeline import InferencePipeline  # 确保与 batch_runner.py 同目录，或已在 PYTHONPATH
+from summarizer import summarize_file  # 顶部导入
 
 SUPPORTED_AUDIO = {".wav", ".mp3", ".m4a", ".flac", ".aac", ".ogg", ".wma"}
 SUPPORTED_VIDEO = {".mp4", ".mkv", ".mov", ".avi", ".flv", ".webm"}
@@ -181,6 +181,18 @@ def process_one(file_path: Path, args, pipe: InferencePipeline) -> Tuple[Path, b
 
         # 写入 merge.txt（按你已有的合并逻辑）
         write_merge_txt(segments, merge_path)
+
+        # 追加：写出 *_summary.md
+        try:
+            if args.summarize:
+                summary_path = merge_path.with_name(merge_path.stem.replace("_merge", "") + "_summary.md")
+                model_path = args.llm_model  # 例如: "Qwen/Qwen2.5-3B-Instruct" 或 本地路径
+                backend = args.llm_backend   # "transformers" 或 "llama_cpp"
+                summary_path.parent.mkdir(parents=True, exist_ok=True)
+                summarize_file(merge_path, summary_path, model_path=model_path, backend=backend)
+        except Exception as e:
+            print(f"[WARN] summarize-fail: {e}")
+
 
         # 清理临时
         if prepared != file_path and prepared.name.endswith(".__tmp__.wav"):
