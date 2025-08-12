@@ -122,9 +122,9 @@ class App(tk.Tk):
             self.model_var.set(d)
 
     def start(self):
-        if BATCH_RUNNER is None or not VENV_PY.exists():
-            messagebox.showerror("无法启动", "环境未就绪，请检查虚拟环境和 batch_runner.py 路径。")
-            return
+        #if BATCH_RUNNER is None or not VENV_PY.exists():
+        #    messagebox.showerror("无法启动", "环境未就绪，请检查虚拟环境和 batch_runner.py 路径。")
+        #    return
 
         input_dir = self.input_var.get().strip()
         if not input_dir:
@@ -164,8 +164,9 @@ class App(tk.Tk):
         if self.overwrite_var.get():
             cmd += ["--overwrite"]
 
-        # 设置工作目录为 batch_runner.py 所在目录，保证相对导入正常
-        cwd = Path(BATCH_RUNNER).parent
+        # 设置工作目录为 runner_path   .py 所在目录，保证相对导入正常
+        cwd = runner_path.parent
+
 
         # 启动子进程（显示控制台窗口，便于看日志；如果不想要控制台，可以改 creationflags）
         try:
