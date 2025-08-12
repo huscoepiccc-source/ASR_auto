@@ -54,8 +54,7 @@ def ensure_wav(input_path: Path, work_dir: Path) -> Path:
     subprocess.run(cmd, check=True)
     return out
 
-
-def write_merge_txt(segments: List[Dict[str, Any]], out_path: Path, min_chars: int = 200, max_chars: int = 250):
+# def write_merge_txt(segments: List[Dict[str, Any]], out_path: Path, min_chars: int = 200, max_chars: int = 250):  # txt 导出,此处注释掉,便于更替
     """
     将相邻同一说话人的片段合并成段；若一段过长，以句号“。”优先切分，每段控制在 200–250 字。
     输出格式：
@@ -131,6 +130,94 @@ def write_merge_txt(segments: List[Dict[str, Any]], out_path: Path, min_chars: i
     out = "\n".join(lines).rstrip() + "\n"
     out_path.write_text(out, encoding="utf-8")
 
+def write_merge_markdown(
+    segments: List[Dict[str, Any]],
+    out_path: Path,
+    min_chars: int = 200,
+    max_chars: int = 250,
+    frontmatter: str | None = None,
+    heading_level: int = 3
+):
+    """
+    连续同一说话人合并；按“。”+长度在 200–250 字分段；渲染成 Markdown。
+    - 每个说话人块使用 Markdown 标题（默认 ### speaker X）
+    - 段落之间空一行
+    - 可选 frontmatter（YAML），用于 Obsidian
+    """
+    def split_into_paragraphs(text: str) -> List[str]:
+        # 与你当前 write_merge_txt 完全一致的分段逻辑
+        sentences = []
+        buf = []
+        for ch in text:
+            buf.append(ch)
+            if ch == "。":
+                s = "".join(buf).strip()
+                if s:
+                    sentences.append(s)
+                buf = []
+        tail = "".join(buf).strip()
+        if tail:
+            sentences.append(tail)
+
+        paras = []
+        cur = ""
+        for s in sentences:
+            if not cur:
+                cur = s
+                continue
+            if len(cur) < min_chars or (len(cur) + len(s) <= max_chars):
+                cur += s
+            else:
+                paras.append(cur)
+                cur = s
+        if cur:
+            paras.append(cur)
+        return paras
+
+    lines: List[str] = []
+
+    # 可选：Obsidian frontmatter
+    if frontmatter:
+        lines.append(frontmatter.rstrip())
+        lines.append("")
+
+    last_speaker = None
+    buffer: List[str] = []
+
+    def flush_block():
+        nonlocal buffer, last_speaker
+        if not buffer:
+            return
+        block_text = "".join(buffer).strip()
+        if block_text:
+            # Markdown 标题（### speaker X）
+            h = "#" * max(1, int(heading_level))
+            lines.append(f"{h} speaker {last_speaker}")
+            lines.append("")  # 标题与正文之间空一行
+            for para in split_into_paragraphs(block_text):
+                lines.append(para.strip())
+                lines.append("")  # 段落间空一行
+        buffer = []
+
+    for seg in segments:
+        spk = seg.get("speaker", "UNK")
+        text = (seg.get("text", "") or "").strip()
+
+        if last_speaker is None:
+            last_speaker = spk
+
+        if spk != last_speaker:
+            flush_block()
+            last_speaker = spk
+
+        buffer.append(text)
+
+    flush_block()
+
+    out = "\n".join(lines).rstrip() + "\n"
+    out_path.write_text(out, encoding="utf-8")
+
+
 def out_path_merge_inplace(file_path: Path) -> Path:
     """在源目录就地生成 *_merge.md"""
     return file_path.with_name(file_path.stem + "_merge.md")
@@ -149,10 +236,17 @@ def mirror_output_path(input_base: Path, output_base: Path, file_path: Path, suf
     return target.with_suffix(suffix)
 
 def write_all_outputs(result: Dict[str, Any], base_path: Path):
+    # segments = result.get("segments", [])    导出txt 用的四行,这里先给注释掉
+    # full_text = result.get("text", "")
+    # payload = result
+    # write_merge_txt(segments, base_path.with_name(base_path.stem + "_merge.md"))    
+    
     segments = result.get("segments", [])
-    full_text = result.get("text", "")
-    payload = result
-    write_merge_txt(segments, base_path.with_name(base_path.stem + "_merge.md"))    
+    md_path = file_path.with_name(file_path.stem + "_merge.md")
+    # 可选 frontmatter（Obsidian）
+    fm = f"---\ntitle: {file_path.stem}\nsource: {file_path.name}\n---"
+    write_merge_markdown(segments, md_path, frontmatter=fm, heading_level=3)
+
 
 def process_one(file_path: Path, args, pipe: InferencePipeline) -> Tuple[Path, bool, str]:
     """
@@ -169,8 +263,10 @@ def process_one(file_path: Path, args, pipe: InferencePipeline) -> Tuple[Path, b
         merge_path.parent.mkdir(parents=True, exist_ok=True)
 
         # 跳过已存在
-        if not args.overwrite and merge_path.exists():
-            return (merge_path, True, "skip-exist")
+        if not args.overwrite and merge_path.exists():   #导出merge.txt用的,可以注释掉,但保留着也没有事
+            return (merge_path, True, "skip-exist")            #导出merge.txt用的,可以注释掉,但保留着也没有事
+        if not args.overwrite and md_path.exists():
+            return (md_path, True, "skip-exist")
 
         # 准备音频（视频自动抽音轨）
         prepared = ensure_wav(file_path, tmp_work)
