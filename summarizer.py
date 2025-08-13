@@ -174,11 +174,12 @@ class LocalSummarizer:
 
         # 1) 4bit on CUDA (preferred)
         if self.load_cfg.prefer_4bit and can_try_bnb():
+            print(">>> dtype type:", type(dtype), dtype)
             qcfg = self.BitsAndBytesConfig(
                 load_in_4bit=True,
                 bnb_4bit_use_double_quant=True,
                 bnb_4bit_quant_type="nf4",
-                bnb_4bit_compute_dtype=self.torch.float16,  # IMPORTANT: torch dtype, not string
+                bnb_4bit_compute_dtype=dtype   #注释掉self.torch.float16,  # IMPORTANT: torch dtype, not string
             )
             strategies.append(dict(
                 name="cuda-4bit",
