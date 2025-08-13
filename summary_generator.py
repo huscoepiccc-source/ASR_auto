@@ -9,24 +9,17 @@ INPUT_DIR = r"C:\Users\Administrator\Downloads\input"  # 输入目录
 # API_KEY = "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"  # 替换为你的实际API密钥
 # MODEL_NAME = "mistralai/mistral-7b-instruct:free"  # 推荐的免费模型
 # API_URL = "https://openrouter.ai/api/v1/chat/completions"
+
 # 使用DeepSeek的配置   先注释掉，以后再使用
 #API_URL = " https://api.deepseek.com/v1/chat/completions"
 #MODEL_NAME = "deepseek-chat"  # 另外一个是 deepseek-reasoner  官方放出来的名称。总结比较长的文本时候使用。
 #API_KEY = "sk-d5dccc7fc4ba48bfb451f013779eaccf"  #
 
+API_KEY = "sk-kmoyzrgizizvnncwdogezxgpdwqudryawtdknzjoateprupy"  # 替换为你的实际API密钥
+MODEL_NAME = "Qwen/QwQ-32B"  # 推荐的免费模型
+API_URL = "https://api.siliconflow.cn/v1/chat/completions"
+
 from ctransformers import AutoModelForCausalLM
-
-# 加载开源模型（首次运行会自动下载）
-model = AutoModelForCausalLM.from_pretrained(
-    "TheBloke/Mistral-7B-Instruct-v0.1-GGUF",
-    model_file="mistral-7b-instruct-v0.1.Q4_K_M.gguf",
-    model_type="mistral"
-)
-
-def local_generate_summary(text_content):
-    prompt = f"{SYSTEM_PROMPT}\n\n请总结以下文本：{text_content}"
-    response = model(prompt, max_new_tokens=500)
-    return response
 
 
 
