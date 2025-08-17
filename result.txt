@@ -1,545 +1,771 @@
-(asr_env) PS H:\Projects\AudioSeparationGUI> python batch_summarizer_test.py
-llama_model_loader: loaded meta data with 32 key-value pairs and 398 tensors from H:\Projects\AudioSeparationGUI\asr_env\.cache\models\Qwen\Qwen3-4B-GGUF\Qwen3-4B-Q4_K_M.gguf (version GGUF V3 (latest))
-llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
-llama_model_loader: - kv   0:                       general.architecture str              = qwen3
-llama_model_loader: - kv   1:                               general.type str              = model
-llama_model_loader: - kv   2:                               general.name str              = Qwen3-4B
-llama_model_loader: - kv   3:                           general.basename str              = Qwen3-4B
-llama_model_loader: - kv   4:                       general.quantized_by str              = Unsloth
-llama_model_loader: - kv   5:                         general.size_label str              = 4B
-llama_model_loader: - kv   6:                           general.repo_url str              = https://huggingface.co/unsloth
-llama_model_loader: - kv   7:                          qwen3.block_count u32              = 36
-llama_model_loader: - kv   8:                       qwen3.context_length u32              = 40960
-llama_model_loader: - kv   9:                     qwen3.embedding_length u32              = 2560
-llama_model_loader: - kv  10:                  qwen3.feed_forward_length u32              = 9728
-llama_model_loader: - kv  11:                 qwen3.attention.head_count u32              = 32
-llama_model_loader: - kv  12:              qwen3.attention.head_count_kv u32              = 8
-llama_model_loader: - kv  13:                       qwen3.rope.freq_base f32              = 1000000.000000
-llama_model_loader: - kv  14:     qwen3.attention.layer_norm_rms_epsilon f32              = 0.000001
-llama_model_loader: - kv  15:                 qwen3.attention.key_length u32              = 128
-llama_model_loader: - kv  16:               qwen3.attention.value_length u32              = 128
-llama_model_loader: - kv  17:                       tokenizer.ggml.model str              = gpt2
-llama_model_loader: - kv  18:                         tokenizer.ggml.pre str              = qwen2
-llama_model_loader: - kv  19:                      tokenizer.ggml.tokens arr[str,151936]  = ["!", "\"", "#", "$", "%", "&", "'", ...
-llama_model_loader: - kv  20:                  tokenizer.ggml.token_type arr[i32,151936]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
-llama_model_loader: - kv  21:                      tokenizer.ggml.merges arr[str,151387]  = ["Ġ Ġ", "ĠĠ ĠĠ", "i n", "Ġ t",...
-llama_model_loader: - kv  22:                tokenizer.ggml.eos_token_id u32              = 151645
-llama_model_loader: - kv  23:            tokenizer.ggml.padding_token_id u32              = 151654
-llama_model_loader: - kv  24:               tokenizer.ggml.add_bos_token bool             = false
-llama_model_loader: - kv  25:                    tokenizer.chat_template str              = {%- if tools %}\n    {{- '<|im_start|>...
-llama_model_loader: - kv  26:               general.quantization_version u32              = 2
-llama_model_loader: - kv  27:                          general.file_type u32              = 15
-llama_model_loader: - kv  28:                      quantize.imatrix.file str              = Qwen3-4B-GGUF/imatrix_unsloth.dat
-llama_model_loader: - kv  29:                   quantize.imatrix.dataset str              = unsloth_calibration_Qwen3-4B.txt
-llama_model_loader: - kv  30:             quantize.imatrix.entries_count i32              = 252
-llama_model_loader: - kv  31:              quantize.imatrix.chunks_count i32              = 685
-llama_model_loader: - type  f32:  145 tensors
-llama_model_loader: - type q4_K:  216 tensors
-llama_model_loader: - type q6_K:   37 tensors
-print_info: file format = GGUF V3 (latest)
-print_info: file type   = Q4_K - Medium
-print_info: file size   = 2.32 GiB (4.95 BPW)
-init_tokenizer: initializing tokenizer for type 2
-load: control token: 151661 '<|fim_suffix|>' is not marked as EOG
-load: control token: 151649 '<|box_end|>' is not marked as EOG
-load: control token: 151647 '<|object_ref_end|>' is not marked as EOG
-load: control token: 151654 '<|vision_pad|>' is not marked as EOG
-load: control token: 151659 '<|fim_prefix|>' is not marked as EOG
-load: control token: 151648 '<|box_start|>' is not marked as EOG
-load: control token: 151644 '<|im_start|>' is not marked as EOG
-load: control token: 151646 '<|object_ref_start|>' is not marked as EOG
-load: control token: 151650 '<|quad_start|>' is not marked as EOG
-load: control token: 151651 '<|quad_end|>' is not marked as EOG
-load: control token: 151652 '<|vision_start|>' is not marked as EOG
-load: control token: 151653 '<|vision_end|>' is not marked as EOG
-load: control token: 151655 '<|image_pad|>' is not marked as EOG
-load: control token: 151656 '<|video_pad|>' is not marked as EOG
-load: control token: 151660 '<|fim_middle|>' is not marked as EOG
-load: printing all EOG tokens:
-load:   - 151643 ('<|endoftext|>')
-load:   - 151645 ('<|im_end|>')
-load:   - 151662 ('<|fim_pad|>')
-load:   - 151663 ('<|repo_name|>')
-load:   - 151664 ('<|file_sep|>')
-load: special tokens cache size = 26
-load: token to piece cache size = 0.9311 MB
-print_info: arch             = qwen3
-print_info: vocab_only       = 0
-print_info: n_ctx_train      = 40960
-print_info: n_embd           = 2560
-print_info: n_layer          = 36
-print_info: n_head           = 32
-print_info: n_head_kv        = 8
-print_info: n_rot            = 128
-print_info: n_swa            = 0
-print_info: is_swa_any       = 0
-print_info: n_embd_head_k    = 128
-print_info: n_embd_head_v    = 128
-print_info: n_gqa            = 4
-print_info: n_embd_k_gqa     = 1024
-print_info: n_embd_v_gqa     = 1024
-print_info: f_norm_eps       = 0.0e+00
-print_info: f_norm_rms_eps   = 1.0e-06
-print_info: f_clamp_kqv      = 0.0e+00
-print_info: f_max_alibi_bias = 0.0e+00
-print_info: f_logit_scale    = 0.0e+00
-print_info: f_attn_scale     = 0.0e+00
-print_info: n_ff             = 9728
-print_info: n_expert         = 0
-print_info: n_expert_used    = 0
-print_info: causal attn      = 1
-print_info: pooling type     = -1
-print_info: rope type        = 2
-print_info: rope scaling     = linear
-print_info: freq_base_train  = 1000000.0
-print_info: freq_scale_train = 1
-print_info: n_ctx_orig_yarn  = 40960
-print_info: rope_finetuned   = unknown
-print_info: model type       = 4B
-print_info: model params     = 4.02 B
-print_info: general.name     = Qwen3-4B
-print_info: vocab type       = BPE
-print_info: n_vocab          = 151936
-print_info: n_merges         = 151387
-print_info: BOS token        = 11 ','
-print_info: EOS token        = 151645 '<|im_end|>'
-print_info: EOT token        = 151645 '<|im_end|>'
-print_info: PAD token        = 151654 '<|vision_pad|>'
-print_info: LF token         = 198 'Ċ'
-print_info: FIM PRE token    = 151659 '<|fim_prefix|>'
-print_info: FIM SUF token    = 151661 '<|fim_suffix|>'
-print_info: FIM MID token    = 151660 '<|fim_middle|>'
-print_info: FIM PAD token    = 151662 '<|fim_pad|>'
-print_info: FIM REP token    = 151663 '<|repo_name|>'
-print_info: FIM SEP token    = 151664 '<|file_sep|>'
-print_info: EOG token        = 151643 '<|endoftext|>'
-print_info: EOG token        = 151645 '<|im_end|>'
-print_info: EOG token        = 151662 '<|fim_pad|>'
-print_info: EOG token        = 151663 '<|repo_name|>'
-print_info: EOG token        = 151664 '<|file_sep|>'
-print_info: max token length = 256
-load_tensors: loading model tensors, this can take a while... (mmap = true)
-load_tensors: layer   0 assigned to device CPU, is_swa = 0
-load_tensors: layer   1 assigned to device CPU, is_swa = 0
-load_tensors: layer   2 assigned to device CPU, is_swa = 0
-load_tensors: layer   3 assigned to device CPU, is_swa = 0
-load_tensors: layer   4 assigned to device CPU, is_swa = 0
-load_tensors: layer   5 assigned to device CPU, is_swa = 0
-load_tensors: layer   6 assigned to device CPU, is_swa = 0
-load_tensors: layer   7 assigned to device CPU, is_swa = 0
-load_tensors: layer   8 assigned to device CPU, is_swa = 0
-load_tensors: layer   9 assigned to device CPU, is_swa = 0
-load_tensors: layer  10 assigned to device CPU, is_swa = 0
-load_tensors: layer  11 assigned to device CPU, is_swa = 0
-load_tensors: layer  12 assigned to device CPU, is_swa = 0
-load_tensors: layer  13 assigned to device CPU, is_swa = 0
-load_tensors: layer  14 assigned to device CPU, is_swa = 0
-load_tensors: layer  15 assigned to device CPU, is_swa = 0
-load_tensors: layer  16 assigned to device CPU, is_swa = 0
-load_tensors: layer  17 assigned to device CPU, is_swa = 0
-load_tensors: layer  18 assigned to device CPU, is_swa = 0
-load_tensors: layer  19 assigned to device CPU, is_swa = 0
-load_tensors: layer  20 assigned to device CPU, is_swa = 0
-load_tensors: layer  21 assigned to device CPU, is_swa = 0
-load_tensors: layer  22 assigned to device CPU, is_swa = 0
-load_tensors: layer  23 assigned to device CPU, is_swa = 0
-load_tensors: layer  24 assigned to device CPU, is_swa = 0
-load_tensors: layer  25 assigned to device CPU, is_swa = 0
-load_tensors: layer  26 assigned to device CPU, is_swa = 0
-load_tensors: layer  27 assigned to device CPU, is_swa = 0
-load_tensors: layer  28 assigned to device CPU, is_swa = 0
-load_tensors: layer  29 assigned to device CPU, is_swa = 0
-load_tensors: layer  30 assigned to device CPU, is_swa = 0
-load_tensors: layer  31 assigned to device CPU, is_swa = 0
-load_tensors: layer  32 assigned to device CPU, is_swa = 0
-load_tensors: layer  33 assigned to device CPU, is_swa = 0
-load_tensors: layer  34 assigned to device CPU, is_swa = 0
-load_tensors: layer  35 assigned to device CPU, is_swa = 0
-load_tensors: layer  36 assigned to device CPU, is_swa = 0
-load_tensors: tensor 'token_embd.weight' (q6_K) (and 182 others) cannot be used with preferred buffer type CPU_REPACK, using CPU instead
-load_tensors:   CPU_REPACK model buffer size =  1683.28 MiB
-load_tensors:   CPU_Mapped model buffer size =  2362.55 MiB
-repack: repack tensor blk.0.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.0.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.0.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.0.ffn_gate.weight with q4_K_8x8
-.repack: repack tensor blk.0.ffn_up.weight with q4_K_8x8
-repack: repack tensor blk.1.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.1.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.1.attn_output.weight with q4_K_8x8
-.repack: repack tensor blk.1.ffn_gate.weight with q4_K_8x8
-repack: repack tensor blk.1.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.2.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.2.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.2.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.2.ffn_gate.weight with q4_K_8x8
-.repack: repack tensor blk.2.ffn_up.weight with q4_K_8x8
-repack: repack tensor blk.3.attn_q.weight with q4_K_8x8
-.repack: repack tensor blk.3.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.3.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.3.ffn_gate.weight with q4_K_8x8
-.repack: repack tensor blk.3.ffn_up.weight with q4_K_8x8
-repack: repack tensor blk.4.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.4.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.4.attn_v.weight with q4_K_8x8
-repack: repack tensor blk.4.attn_output.weight with q4_K_8x8
-.repack: repack tensor blk.4.ffn_gate.weight with q4_K_8x8
-repack: repack tensor blk.4.ffn_down.weight with q4_K_8x8
-.repack: repack tensor blk.4.ffn_up.weight with q4_K_8x8
-repack: repack tensor blk.5.attn_q.weight with q4_K_8x8
-.repack: repack tensor blk.5.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.5.attn_v.weight with q4_K_8x8
-repack: repack tensor blk.5.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.5.ffn_gate.weight with q4_K_8x8
-.repack: repack tensor blk.5.ffn_down.weight with q4_K_8x8
-repack: repack tensor blk.5.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.6.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.6.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.6.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.6.ffn_gate.weight with q4_K_8x8
-.repack: repack tensor blk.6.ffn_up.weight with q4_K_8x8
-repack: repack tensor blk.7.attn_q.weight with q4_K_8x8
-.repack: repack tensor blk.7.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.7.attn_v.weight with q4_K_8x8
-repack: repack tensor blk.7.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.7.ffn_gate.weight with q4_K_8x8
-repack: repack tensor blk.7.ffn_down.weight with q4_K_8x8
-.repack: repack tensor blk.7.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.8.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.8.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.8.attn_v.weight with q4_K_8x8
-repack: repack tensor blk.8.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.8.ffn_gate.weight with q4_K_8x8
-.repack: repack tensor blk.8.ffn_down.weight with q4_K_8x8
-repack: repack tensor blk.8.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.9.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.9.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.9.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.9.ffn_gate.weight with q4_K_8x8
-.repack: repack tensor blk.9.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.10.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.10.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.10.attn_v.weight with q4_K_8x8
-repack: repack tensor blk.10.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.10.ffn_gate.weight with q4_K_8x8
-.repack: repack tensor blk.10.ffn_down.weight with q4_K_8x8
-repack: repack tensor blk.10.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.11.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.11.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.11.attn_v.weight with q4_K_8x8
-repack: repack tensor blk.11.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.11.ffn_gate.weight with q4_K_8x8
-.repack: repack tensor blk.11.ffn_down.weight with q4_K_8x8
-.repack: repack tensor blk.11.ffn_up.weight with q4_K_8x8
-repack: repack tensor blk.12.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.12.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.12.attn_output.weight with q4_K_8x8
-.repack: repack tensor blk.12.ffn_gate.weight with q4_K_8x8
-repack: repack tensor blk.12.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.13.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.13.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.13.attn_v.weight with q4_K_8x8
-repack: repack tensor blk.13.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.13.ffn_gate.weight with q4_K_8x8
-.repack: repack tensor blk.13.ffn_down.weight with q4_K_8x8
-repack: repack tensor blk.13.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.14.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.14.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.14.attn_v.weight with q4_K_8x8
-repack: repack tensor blk.14.attn_output.weight with q4_K_8x8
-.repack: repack tensor blk.14.ffn_gate.weight with q4_K_8x8
-repack: repack tensor blk.14.ffn_down.weight with q4_K_8x8
-.repack: repack tensor blk.14.ffn_up.weight with q4_K_8x8
-repack: repack tensor blk.15.attn_q.weight with q4_K_8x8
-.repack: repack tensor blk.15.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.15.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.15.ffn_gate.weight with q4_K_8x8
-repack: repack tensor blk.15.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.16.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.16.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.16.attn_v.weight with q4_K_8x8
-repack: repack tensor blk.16.attn_output.weight with q4_K_8x8
-.repack: repack tensor blk.16.ffn_gate.weight with q4_K_8x8
-repack: repack tensor blk.16.ffn_down.weight with q4_K_8x8
-.repack: repack tensor blk.16.ffn_up.weight with q4_K_8x8
-repack: repack tensor blk.17.attn_q.weight with q4_K_8x8
-.repack: repack tensor blk.17.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.17.attn_v.weight with q4_K_8x8
-repack: repack tensor blk.17.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.17.ffn_gate.weight with q4_K_8x8
-repack: repack tensor blk.17.ffn_down.weight with q4_K_8x8
-.repack: repack tensor blk.17.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.18.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.18.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.18.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.18.ffn_gate.weight with q4_K_8x8
-.repack: repack tensor blk.18.ffn_up.weight with q4_K_8x8
-repack: repack tensor blk.19.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.19.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.19.attn_v.weight with q4_K_8x8
-.repack: repack tensor blk.19.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.19.ffn_gate.weight with q4_K_8x8
-repack: repack tensor blk.19.ffn_down.weight with q4_K_8x8
-.repack: repack tensor blk.19.ffn_up.weight with q4_K_8x8
-repack: repack tensor blk.20.attn_q.weight with q4_K_8x8
-.repack: repack tensor blk.20.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.20.attn_v.weight with q4_K_8x8
-repack: repack tensor blk.20.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.20.ffn_gate.weight with q4_K_8x8
-.repack: repack tensor blk.20.ffn_down.weight with q4_K_8x8
-repack: repack tensor blk.20.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.21.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.21.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.21.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.21.ffn_gate.weight with q4_K_8x8
-.repack: repack tensor blk.21.ffn_up.weight with q4_K_8x8
-repack: repack tensor blk.22.attn_q.weight with q4_K_8x8
-.repack: repack tensor blk.22.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.22.attn_v.weight with q4_K_8x8
-repack: repack tensor blk.22.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.22.ffn_gate.weight with q4_K_8x8
-.repack: repack tensor blk.22.ffn_down.weight with q4_K_8x8
-repack: repack tensor blk.22.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.23.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.23.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.23.attn_v.weight with q4_K_8x8
-repack: repack tensor blk.23.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.23.ffn_gate.weight with q4_K_8x8
-.repack: repack tensor blk.23.ffn_down.weight with q4_K_8x8
-repack: repack tensor blk.23.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.24.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.24.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.24.attn_output.weight with q4_K_8x8
-.repack: repack tensor blk.24.ffn_gate.weight with q4_K_8x8
-repack: repack tensor blk.24.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.25.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.25.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.25.attn_v.weight with q4_K_8x8
-repack: repack tensor blk.25.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.25.ffn_gate.weight with q4_K_8x8
-.repack: repack tensor blk.25.ffn_down.weight with q4_K_8x8
-repack: repack tensor blk.25.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.26.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.26.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.26.attn_v.weight with q4_K_8x8
-repack: repack tensor blk.26.attn_output.weight with q4_K_8x8
-.repack: repack tensor blk.26.ffn_gate.weight with q4_K_8x8
-repack: repack tensor blk.26.ffn_down.weight with q4_K_8x8
-.repack: repack tensor blk.26.ffn_up.weight with q4_K_8x8
-repack: repack tensor blk.27.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.27.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.27.attn_output.weight with q4_K_8x8
-.repack: repack tensor blk.27.ffn_gate.weight with q4_K_8x8
-repack: repack tensor blk.27.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.28.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.28.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.28.attn_v.weight with q4_K_8x8
-repack: repack tensor blk.28.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.28.ffn_gate.weight with q4_K_8x8
-.repack: repack tensor blk.28.ffn_down.weight with q4_K_8x8
-.repack: repack tensor blk.28.ffn_up.weight with q4_K_8x8
-repack: repack tensor blk.29.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.29.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.29.attn_v.weight with q4_K_8x8
-repack: repack tensor blk.29.attn_output.weight with q4_K_8x8
-.repack: repack tensor blk.29.ffn_gate.weight with q4_K_8x8
-repack: repack tensor blk.29.ffn_down.weight with q4_K_8x8
-.repack: repack tensor blk.29.ffn_up.weight with q4_K_8x8
-repack: repack tensor blk.30.attn_q.weight with q4_K_8x8
-.repack: repack tensor blk.30.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.30.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.30.ffn_gate.weight with q4_K_8x8
-repack: repack tensor blk.30.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.31.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.31.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.31.attn_output.weight with q4_K_8x8
-.repack: repack tensor blk.31.ffn_gate.weight with q4_K_8x8
-repack: repack tensor blk.31.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.32.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.32.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.32.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.32.ffn_gate.weight with q4_K_8x8
-.repack: repack tensor blk.32.ffn_up.weight with q4_K_8x8
-repack: repack tensor blk.33.attn_q.weight with q4_K_8x8
-.repack: repack tensor blk.33.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.33.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.33.ffn_gate.weight with q4_K_8x8
-repack: repack tensor blk.33.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.34.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.34.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.34.attn_output.weight with q4_K_8x8
-.repack: repack tensor blk.34.ffn_gate.weight with q4_K_8x8
-repack: repack tensor blk.34.ffn_up.weight with q4_K_8x8
-.repack: repack tensor blk.35.attn_q.weight with q4_K_8x8
-repack: repack tensor blk.35.attn_k.weight with q4_K_8x8
-repack: repack tensor blk.35.attn_output.weight with q4_K_8x8
-repack: repack tensor blk.35.ffn_gate.weight with q4_K_8x8
-.repack: repack tensor blk.35.ffn_up.weight with q4_K_8x8
-..................
-llama_context: constructing llama_context
-llama_context: n_seq_max     = 1
-llama_context: n_ctx         = 4096
-llama_context: n_ctx_per_seq = 4096
-llama_context: n_batch       = 512
-llama_context: n_ubatch      = 512
-llama_context: causal_attn   = 1
-llama_context: flash_attn    = 0
-llama_context: kv_unified    = false
-llama_context: freq_base     = 1000000.0
-llama_context: freq_scale    = 1
-llama_context: n_ctx_per_seq (4096) < n_ctx_train (40960) -- the full capacity of the model will not be utilized
-set_abort_callback: call
-llama_context:        CPU  output buffer size =     0.58 MiB
-create_memory: n_ctx = 4096 (padded)
-llama_kv_cache_unified: layer   0: dev = CPU
-llama_kv_cache_unified: layer   1: dev = CPU
-llama_kv_cache_unified: layer   2: dev = CPU
-llama_kv_cache_unified: layer   3: dev = CPU
-llama_kv_cache_unified: layer   4: dev = CPU
-llama_kv_cache_unified: layer   5: dev = CPU
-llama_kv_cache_unified: layer   6: dev = CPU
-llama_kv_cache_unified: layer   7: dev = CPU
-llama_kv_cache_unified: layer   8: dev = CPU
-llama_kv_cache_unified: layer   9: dev = CPU
-llama_kv_cache_unified: layer  10: dev = CPU
-llama_kv_cache_unified: layer  11: dev = CPU
-llama_kv_cache_unified: layer  12: dev = CPU
-llama_kv_cache_unified: layer  13: dev = CPU
-llama_kv_cache_unified: layer  14: dev = CPU
-llama_kv_cache_unified: layer  15: dev = CPU
-llama_kv_cache_unified: layer  16: dev = CPU
-llama_kv_cache_unified: layer  17: dev = CPU
-llama_kv_cache_unified: layer  18: dev = CPU
-llama_kv_cache_unified: layer  19: dev = CPU
-llama_kv_cache_unified: layer  20: dev = CPU
-llama_kv_cache_unified: layer  21: dev = CPU
-llama_kv_cache_unified: layer  22: dev = CPU
-llama_kv_cache_unified: layer  23: dev = CPU
-llama_kv_cache_unified: layer  24: dev = CPU
-llama_kv_cache_unified: layer  25: dev = CPU
-llama_kv_cache_unified: layer  26: dev = CPU
-llama_kv_cache_unified: layer  27: dev = CPU
-llama_kv_cache_unified: layer  28: dev = CPU
-llama_kv_cache_unified: layer  29: dev = CPU
-llama_kv_cache_unified: layer  30: dev = CPU
-llama_kv_cache_unified: layer  31: dev = CPU
-llama_kv_cache_unified: layer  32: dev = CPU
-llama_kv_cache_unified: layer  33: dev = CPU
-llama_kv_cache_unified: layer  34: dev = CPU
-llama_kv_cache_unified: layer  35: dev = CPU
-llama_kv_cache_unified:        CPU KV buffer size =   576.00 MiB
-llama_kv_cache_unified: size =  576.00 MiB (  4096 cells,  36 layers,  1/1 seqs), K (f16):  288.00 MiB, V (f16):  288.00 MiB
-llama_context: enumerating backends
-llama_context: backend_ptrs.size() = 1
-llama_context: max_nodes = 3184
-llama_context: worst-case: n_tokens = 512, n_seqs = 1, n_outputs = 0
-graph_reserve: reserving a graph for ubatch with n_tokens =  512, n_seqs =  1, n_outputs =  512
-graph_reserve: reserving a graph for ubatch with n_tokens =    1, n_seqs =  1, n_outputs =    1
-graph_reserve: reserving a graph for ubatch with n_tokens =  512, n_seqs =  1, n_outputs =  512
-llama_context:        CPU compute buffer size =   301.75 MiB
-llama_context: graph nodes  = 1410
-llama_context: graph splits = 1
-CPU : SSE3 = 1 | SSSE3 = 1 | AVX = 1 | AVX2 = 1 | F16C = 1 | FMA = 1 | LLAMAFILE = 1 | OPENMP = 1 | REPACK = 1 |
-Model metadata: {'general.name': 'Qwen3-4B', 'general.architecture': 'qwen3', 'qwen3.attention.layer_norm_rms_epsilon': '0.000001', 'general.type': 'model', 'general.repo_url': 'https://huggingface.co/unsloth', 'general.basename': 'Qwen3-4B', 'tokenizer.ggml.pre': 'qwen2', 'general.quantized_by': 'Unsloth', 'qwen3.block_count': '36', 'general.size_label': '4B', 'qwen3.context_length': '40960', 'qwen3.embedding_length': '2560', 'qwen3.feed_forward_length': '9728', 'qwen3.attention.head_count': '32', 'qwen3.attention.head_count_kv': '8', 'qwen3.rope.freq_base': '1000000.000000', 'tokenizer.ggml.add_bos_token': 'false', 'qwen3.attention.key_length': '128', 'qwen3.attention.value_length': '128', 'tokenizer.ggml.model': 'gpt2', 'general.file_type': '15', 'tokenizer.ggml.eos_token_id': '151645', 'tokenizer.ggml.padding_token_id': '151654', 'tokenizer.chat_template': '{%- if tools %}\n    {{- \'<|im_start|>system\\n\' }}\n    {%- if messages[0].role == \'system\' %}\n        {{- messages[0].content + \'\\n\\n\' }}\n    {%- endif %}\n    {{- "# Tools\\n\\nYou may call one or more functions to assist with the user query.\\n\\nYou are provided with function signatures within <tools></tools> XML tags:\\n<tools>" }}\n    {%- for tool in tools %}\n        {{- "\\n" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- "\\n</tools>\\n\\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\\n<tool_call>\\n{\\"name\\": <function-name>, \\"arguments\\": <args-json-object>}\\n</tool_call><|im_end|>\\n" }}\n{%- else %}\n    {%- if messages[0].role == \'system\' %}\n        {{- \'<|im_start|>system\\n\' + messages[0].content + \'<|im_end|>\\n\' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for forward_message in messages %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- set message = messages[index] %}\n    {%- set current_content = message.content if message.content is defined and message.content is not none else \'\' %}\n    {%- set tool_start = \'<tool_response>\' %}\n    {%- set tool_start_length = tool_start|length %}\n    {%- set start_of_message = current_content[:tool_start_length] %}\n    {%- set tool_end = \'</tool_response>\' %}\n    {%- set tool_end_length = tool_end|length %}\n    {%- set start_pos = (current_content|length) - tool_end_length %}\n    {%- if start_pos < 0 %}\n        {%- set start_pos = 0 %}\n    {%- endif %}\n    {%- set end_of_message = current_content[start_pos:] %}\n    {%- if ns.multi_step_tool and message.role == "user" and not(start_of_message == tool_start and end_of_message == tool_end) %}\n        {%- set ns.multi_step_tool = false %}\n        {%- set ns.last_query_index = index %}\n    {%- endif %}\n{%- endfor %}\n{%- for message in messages %}\n    {%- if (message.role == "user") or (message.role == "system" and not loop.first) %}\n        {{- \'<|im_start|>\' + message.role + \'\\n\' + message.content + \'<|im_end|>\' + \'\\n\' }}\n    {%- elif message.role == "assistant" %}\n        {%- set m_content = message.content if message.content is defined and message.content is not none else \'\' %}\n        {%- set content = m_content %}\n        {%- set reasoning_content = \'\' %}\n        {%- if message.reasoning_content is defined and message.reasoning_content is not none %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if \'</think>\' in m_content %}\n                {%- set content = (m_content.split(\'</think>\')|last).lstrip(\'\\n\') %}\n                {%- set reasoning_content = (m_content.split(\'</think>\')|first).rstrip(\'\\n\') %}\n                {%- set reasoning_content = (reasoning_content.split(\'<think>\')|last).lstrip(\'\\n\') %}\n            {%- endif %}\n        {%- endif %}\n        {%- if loop.index0 > ns.last_query_index %}\n            {%- if loop.last or (not loop.last and (not reasoning_content.strip() == \'\')) %}\n                {{- \'<|im_start|>\' + message.role + \'\\n<think>\\n\' + reasoning_content.strip(\'\\n\') + \'\\n</think>\\n\\n\' + content.lstrip(\'\\n\') }}\n            {%- else %}\n                {{- \'<|im_start|>\' + message.role + \'\\n\' + content }}\n            {%- endif %}\n        {%- else %}\n            {{- \'<|im_start|>\' + message.role + \'\\n\' + content }}\n        {%- endif %}\n        {%- if message.tool_calls %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if (loop.first and content) or (not loop.first) %}\n                    {{- \'\\n\' }}\n                {%- endif %}\n                {%- if tool_call.function %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {{- \'<tool_call>\\n{"name": "\' }}\n                {{- tool_call.name }}\n                {{- \'", "arguments": \' }}\n                {%- if tool_call.arguments is string %}\n                    {{- tool_call.arguments }}\n                {%- else %}\n                    {{- tool_call.arguments | tojson }}\n                {%- endif %}\n                {{- \'}\\n</tool_call>\' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- \'<|im_end|>\\n\' }}\n    {%- elif message.role == "tool" %}\n        {%- if loop.first or (messages[loop.index0 - 1].role != "tool") %}\n            {{- \'<|im_start|>user\' }}\n        {%- endif %}\n        {{- \'\\n<tool_response>\\n\' }}\n        {{- message.content }}\n        {{- \'\\n</tool_response>\' }}\n        {%- if loop.last or (messages[loop.index0 + 1].role != "tool") %}\n            {{- \'<|im_end|>\\n\' }}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- \'<|im_start|>assistant\\n\' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- \'<think>\\n\\n</think>\\n\\n\' }}\n    {%- endif %}\n{%- endif %}', 'general.quantization_version': '2', 'quantize.imatrix.chunks_count': '685', 'quantize.imatrix.file': 'Qwen3-4B-GGUF/imatrix_unsloth.dat', 'quantize.imatrix.dataset': 'unsloth_calibration_Qwen3-4B.txt', 'quantize.imatrix.entries_count': '252'}
-Available chat formats from metadata: chat_template.default
-Using gguf chat template: {%- if tools %}
-    {{- '<|im_start|>system\n' }}
-    {%- if messages[0].role == 'system' %}
-        {{- messages[0].content + '\n\n' }}
-    {%- endif %}
-    {{- "# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>" }}
-    {%- for tool in tools %}
-        {{- "\n" }}
-        {{- tool | tojson }}
-    {%- endfor %}
-    {{- "\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call><|im_end|>\n" }}
-{%- else %}
-    {%- if messages[0].role == 'system' %}
-        {{- '<|im_start|>system\n' + messages[0].content + '<|im_end|>\n' }}
-    {%- endif %}
-{%- endif %}
-{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}
-{%- for forward_message in messages %}
-    {%- set index = (messages|length - 1) - loop.index0 %}
-    {%- set message = messages[index] %}
-    {%- set current_content = message.content if message.content is defined and message.content is not none else '' %}
-    {%- set tool_start = '<tool_response>' %}
-    {%- set tool_start_length = tool_start|length %}
-    {%- set start_of_message = current_content[:tool_start_length] %}
-    {%- set tool_end = '</tool_response>' %}
-    {%- set tool_end_length = tool_end|length %}
-    {%- set start_pos = (current_content|length) - tool_end_length %}
-    {%- if start_pos < 0 %}
-        {%- set start_pos = 0 %}
-    {%- endif %}
-    {%- set end_of_message = current_content[start_pos:] %}
-    {%- if ns.multi_step_tool and message.role == "user" and not(start_of_message == tool_start and end_of_message == tool_end) %}
-        {%- set ns.multi_step_tool = false %}
-        {%- set ns.last_query_index = index %}
-    {%- endif %}
-{%- endfor %}
-{%- for message in messages %}
-    {%- if (message.role == "user") or (message.role == "system" and not loop.first) %}
-        {{- '<|im_start|>' + message.role + '\n' + message.content + '<|im_end|>' + '\n' }}
-    {%- elif message.role == "assistant" %}
-        {%- set m_content = message.content if message.content is defined and message.content is not none else '' %}
-        {%- set content = m_content %}
-        {%- set reasoning_content = '' %}
-        {%- if message.reasoning_content is defined and message.reasoning_content is not none %}
-            {%- set reasoning_content = message.reasoning_content %}
-        {%- else %}
-            {%- if '</think>' in m_content %}
-                {%- set content = (m_content.split('</think>')|last).lstrip('\n') %}
-                {%- set reasoning_content = (m_content.split('</think>')|first).rstrip('\n') %}
-                {%- set reasoning_content = (reasoning_content.split('<think>')|last).lstrip('\n') %}
-            {%- endif %}
-        {%- endif %}
-        {%- if loop.index0 > ns.last_query_index %}
-            {%- if loop.last or (not loop.last and (not reasoning_content.strip() == '')) %}
-                {{- '<|im_start|>' + message.role + '\n<think>\n' + reasoning_content.strip('\n') + '\n</think>\n\n' + content.lstrip('\n') }}
-            {%- else %}
-                {{- '<|im_start|>' + message.role + '\n' + content }}
-            {%- endif %}
-        {%- else %}
-            {{- '<|im_start|>' + message.role + '\n' + content }}
-        {%- endif %}
-        {%- if message.tool_calls %}
-            {%- for tool_call in message.tool_calls %}
-                {%- if (loop.first and content) or (not loop.first) %}
-                    {{- '\n' }}
-                {%- endif %}
-                {%- if tool_call.function %}
-                    {%- set tool_call = tool_call.function %}
-                {%- endif %}
-                {{- '<tool_call>\n{"name": "' }}
-                {{- tool_call.name }}
-                {{- '", "arguments": ' }}
-                {%- if tool_call.arguments is string %}
-                    {{- tool_call.arguments }}
-                {%- else %}
-                    {{- tool_call.arguments | tojson }}
-                {%- endif %}
-                {{- '}\n</tool_call>' }}
-            {%- endfor %}
-        {%- endif %}
-        {{- '<|im_end|>\n' }}
-    {%- elif message.role == "tool" %}
-        {%- if loop.first or (messages[loop.index0 - 1].role != "tool") %}
-            {{- '<|im_start|>user' }}
-        {%- endif %}
-        {{- '\n<tool_response>\n' }}
-        {{- message.content }}
-        {{- '\n</tool_response>' }}
-        {%- if loop.last or (messages[loop.index0 + 1].role != "tool") %}
-            {{- '<|im_end|>\n' }}
-        {%- endif %}
-    {%- endif %}
-{%- endfor %}
-{%- if add_generation_prompt %}
-    {{- '<|im_start|>assistant\n' }}
-    {%- if enable_thinking is defined and enable_thinking is false %}
-        {{- '<think>\n\n</think>\n\n' }}
-    {%- endif %}
-{%- endif %}
-Using chat eos_token: <|im_end|>
-Using chat bos_token: ,
+
+import os
+import argparse
+import concurrent.futures as futures
+import json
+import shutil
+import subprocess
+import time
+import re
+import sys
+from pathlib import Path
+from typing import List, Dict, Any, Tuple, Optional
+import ctypes
+import platform
+import math
+from tqdm import tqdm
+from llama_cpp import Llama
+
+# ===== 配置参数 =====
+# 离线模型路径 - 使用本地模型进行摘要生成
+OFFLINE_MODEL_PATH = r"H:\Projects\AudioSeparationGUI\asr_env\.cache\models\Qwen\Qwen2.5-3B-Instruct-GGUF\qwen2.5-3b-instruct-q4_k_m.gguf"
+MAX_CHUNK_SIZE = 4000  # 最大块大小（字符数）
+OVERLAP_SIZE = 200    # 块之间的重叠大小（字符数）
+
+# ===== 提示词模板 =====
+SYSTEM_PROMPT = """
+你是一个专业的文本摘要生成器。你的任务是根据用户提供的文本内容，生成结构化的摘要。
+请严格按照以下要求生成摘要：
+1. 标题：生成一个5-20字的标题，准确反映文本主题，以全文的内容总结出来，能够让人一眼就能看出这篇文本大概讲的是什么内容
+2. 核心内容：用一句话概括文本的核心内容
+3. 文本梗概：列出3-7个主要内容要点
+4. 文本知识要点：分点列出关键知识点（不超过7点）
+5. 整体摘要控制在800字以内,最少500字,最多800字.
+6. 非常重要的一点，书写格式请务必要严格要求，因为后续我会拿来进行批量替换，所以务必严格遵循我的要求。
+
+# 文本摘要
+# 标题
+(此处为标题内容)
+
+## 核心内容
+(此处为核心内容)
+
+### 文本梗概
+(此处为文本梗概)
+
+### 文本知识要点
+(此处为文本知识要点)
+
+注意：#号和中文字符之间 中间有一个空格符号。
+请再次注意，此书写格式务必严格遵循!!!!
+"""
+
+CHUNK_PROMPT = """
+你是一个专业的文本摘要生成器。你的任务是根据用户提供的文本内容，生成结构化的摘要。
+请严格按照以下要求生成摘要：
+1. 标题：生成一个5-20字的标题，准确反映文本主题，以全文的内容总结出来，能够让人一眼就能看出这篇文本大概讲的是什么内容
+2. 核心内容：用一句话概括文本的核心内容
+3. 文本梗概：列出3-7个主要内容要点
+4. 文本知识要点：分点列出关键知识点（不超过7点）
+5. 整体摘要控制在800字以内,最少500字,最多800字.
+6. 非常重要的一点，书写格式请务必要严格要求，因为后续我会拿来进行批量替换，所以务必严格遵循我的要求。
+
+# 文本摘要
+# 标题
+(此处为标题内容)
+
+## 核心内容
+(此处为核心内容)
+
+### 文本梗概
+(此处为文本梗概)
+
+### 文本知识要点
+(此处为文本知识要点)
+
+注意：#号和中文字符之间 中间有一个空格符号。
+请再次注意，此书写格式务必严格遵循!!!!
+"""
+
+# 支持的媒体文件类型
+SUPPORTED_AUDIO = {".wav", ".mp3", ".m4a", ".flac", ".aac", ".ogg", ".wma"}
+SUPPORTED_VIDEO = {".mp4", ".mkv", ".mov", ".avi", ".flv", ".webm"}
+SUPPORTED_MEDIA = SUPPORTED_AUDIO | SUPPORTED_VIDEO
+
+# ===== 全局变量 =====
+llm = None  # 全局模型实例
+
+def has_ffmpeg() -> bool:
+    """检查系统是否安装了ffmpeg"""
+    try:
+        subprocess.run(
+            ["ffmpeg", "-version"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
+        return True
+    except Exception:
+        return False
+
+def ensure_wav(input_path: Path, work_dir: Path) -> Path:
+    """
+    若是 wav 直接返回；否则优先用 ffmpeg 转成临时 16k 单声道 wav。
+    无 ffmpeg 时直接返回原文件（要求 pipeline 自行处理非 wav / 视频）。
+    """
+    if input_path.suffix.lower() in SUPPORTED_AUDIO and input_path.suffix.lower() == ".wav":
+        return input_path
+    if not has_ffmpeg():
+        return input_path
+    out = work_dir / f"{input_path.stem}.__tmp__.wav"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    cmd = [
+        "ffmpeg",
+        "-y",
+        "-i",
+        str(input_path),
+        "-ac",
+        "1",
+        "-ar",
+        "16000",
+        "-vn",
+        str(out),
+    ]
+    subprocess.run(cmd, check=True)
+    return out
+
+def write_merge_txt(segments: List[Dict[str, Any]], out_path: Path, min_chars: int = 200, max_chars: int = 250):
+    """
+    将相邻同一说话人的片段合并成段；若一段过长，以句号"。"优先切分，每段控制在 200–250 字。
+    输出格式：
+    speaker 0
+    这一段合并后的文本（可被拆成多个 200-250 字段落，每段之间空一行）
+    speaker 1
+    ...
+    """
+    def split_into_paragraphs(text: str) -> List[str]:
+        # 保留句号作为边界；按"。"拆句，再按 min/max 长度聚合
+        sentences = []
+        buf = []
+        for ch in text:
+            buf.append(ch)
+            if ch == "。":
+                s = "".join(buf).strip()
+                if s:
+                    sentences.append(s)
+                buf = []
+        tail = "".join(buf).strip()
+        if tail:
+            sentences.append(tail)
+        paras = []
+        cur = ""
+        for s in sentences:
+            if not cur:
+                cur = s
+                continue
+            # 若当前段不足 min_chars，则尽量继续累加；超过 max_chars 就换段
+            if len(cur) < min_chars or (len(cur) + len(s) <= max_chars):
+                cur += s
+            else:
+                paras.append(cur)
+                cur = s
+        if cur:
+            paras.append(cur)
+        return paras
+    
+    lines: List[str] = []
+    last_speaker = None
+    buffer = []
+    
+    def flush_block():
+        nonlocal buffer, last_speaker
+        if not buffer:
+            return
+        block_text = "".join(buffer).strip()
+        if block_text:
+            lines.append(f"speaker {last_speaker}")
+            for para in split_into_paragraphs(block_text):
+                # 段落正文
+                lines.append(para.strip())
+                # 段落间空一行
+                lines.append("")
+        buffer = []
+    
+    for seg in segments:
+        spk = seg.get("speaker", "UNK")  # 可能是 int/str，都允许
+        text = (seg.get("text", "") or "").strip()
+        # 碰到新说话人，先冲刷上一位说话人的合并段
+        if last_speaker is None:
+            last_speaker = spk
+        if spk != last_speaker:
+            flush_block()
+            last_speaker = spk
+        buffer.append(text)
+    
+    # 冲刷最后一段
+    flush_block()
+    out = "\n".join(lines).rstrip() + "\n"
+    out_path.write_text(out, encoding="utf-8")
+
+def out_path_merge_inplace(file_path: Path) -> Path:
+    """在源目录就地生成 *_merge.md"""
+    return file_path.with_name(file_path.stem + "_merge.md")
+
+def out_path_merge_mirror(input_base: Path, output_base: Path, file_path: Path) -> Path:
+    """在输出根路径进行目录镜像，生成 *_merge.md"""
+    rel = file_path.relative_to(input_base)
+    target = output_base / rel
+    return target.with_name(target.stem + "_merge.md")
+
+def mirror_output_path(input_base: Path, output_base: Path, file_path: Path, suffix: str) -> Path:
+    rel = file_path.relative_to(input_base)
+    target = output_base / rel
+    return target.with_suffix(suffix)
+
+def write_all_outputs(result: Dict[str, Any], base_path: Path):
+    segments = result.get("segments", [])
+    full_text = result.get("text", "")
+    payload = result
+    write_merge_txt(segments, base_path.with_name(base_path.stem + "_merge.md"))
+
+def process_transcription(file_path: Path, args, pipe) -> Tuple[Path, bool, str]:
+    """
+    处理单个文件的转录
+    """
+    try:
+        # 目标输出路径
+        if args.inplace:
+            merge_path = out_path_merge_inplace(file_path)
+        else:
+            merge_path = out_path_merge_mirror(args.input, args.output, file_path)
+        tmp_work = merge_path.parent / "__tmp__"
+        merge_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # 跳过已存在
+        if not args.overwrite and merge_path.exists():
+            return (merge_path, True, "skip-exist")
+        
+        # 准备音频（视频自动抽音轨）
+        prepared = ensure_wav(file_path, tmp_work)
+        
+        # 推理
+        result = pipe.transcribe(prepared)
+        segments = result.get("segments", [])
+        
+        # 写入 merge.txt（按你已有的合并逻辑）
+        write_merge_txt(segments, merge_path)
+        
+        # 清理临时
+        if prepared != file_path and prepared.name.endswith(".__tmp__.wav"):
+            try:
+                prepared.unlink(missing_ok=True)
+                if tmp_work.exists():
+                    shutil.rmtree(tmp_work, ignore_errors=True)
+            except Exception:
+                pass
+        
+        return (merge_path, True, "ok")
+    except subprocess.CalledProcessError as e:
+        return (file_path, False, f"ffmpeg-fail: {e}")
+    except Exception as e:
+        return (file_path, False, f"infer-fail: {e}")
+
+def collect_media_files(input_dir: Path, recursive: bool) -> List[Path]:
+    """收集所有支持的媒体文件"""
+    pattern = "**/*" if recursive else "*"
+    files = []
+    for p in input_dir.glob(pattern):
+        if p.is_file() and p.suffix.lower() in SUPPORTED_MEDIA:
+            files.append(p)
+    return sorted(files)
+
+def collect_md_files(input_dir: Path, recursive: bool) -> List[Path]:
+    """收集所有Markdown文件"""
+    pattern = "**/*.md" if recursive else "*.md"
+    files = []
+    for p in input_dir.glob(pattern):
+        if p.is_file() and p.suffix.lower() == ".md":
+            files.append(p)
+    return sorted(files)
+
+def read_md_file(file_path: Path) -> Optional[str]:
+    """读取Markdown文件内容"""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    except Exception as e:
+        print(f"读取文件失败: {e}")
+        return None
+
+def load_offline_model():
+    """加载离线模型"""
+    global llm
+    
+    # 设置环境变量强制使用GPU
+    os.environ["LLAMA_CUBLAS"] = "1"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # 指定使用第一块GPU
+    
+    print(f"正在加载离线模型: {os.path.basename(OFFLINE_MODEL_PATH)}...")
+    llm = Llama(
+        model_path=OFFLINE_MODEL_PATH,
+        n_ctx=4096,       # 减少上下文长度以节省显存
+        n_gpu_layers=25,  # 减少GPU层数以适应4GB显存
+        n_threads=8,      # CPU线程数
+        verbose=True,     # 开启详细日志
+        offload_kqv=True, # 将部分计算卸载到CPU
+        main_gpu=0,       # 指定使用的主GPU
+        low_vram=True,    # 启用低显存模式
+        use_cublas=True,  # 使用CUDA加速
+        use_cuda=True,     # 强制使用CUDA
+        temperature=0.7   # 适当增加创造性
+    )
+    
+    # 打印GPU信息
+    try:
+        # 获取CUDA设备信息
+        device_name = llm._ctx.cuda_device_name if hasattr(llm, '_ctx') else "Unknown"
+        device_memory = llm._ctx.cuda_device_total_memory if hasattr(llm, '_ctx') else 0
+        print("\n===== GPU 使用情况 =====")
+        print(f"GPU设备: {device_name}")
+        print(f"GPU内存: {device_memory/1024**2:.2f} MB")
+        print(f"加载到GPU的层数: {llm.n_gpu_layers}")
+        print(f"总层数: {llm.n_layers}")
+        print("=======================\n")
+    except Exception as e:
+        print(f"无法获取GPU信息: {str(e)}")
+    
+    print("离线模型加载完成!")
+
+def split_text(text, chunk_size=MAX_CHUNK_SIZE, overlap=OVERLAP_SIZE):
+    """将长文本分割为多个块，保持段落完整性"""
+    chunks = []
+    start = 0
+    text_length = len(text)
+    
+    while start < text_length:
+        end = min(start + chunk_size, text_length)
+        
+        # 尝试在段落边界处分割
+        if end < text_length:
+            # 查找最近的段落结束位置（两个换行符）
+            paragraph_end = text.rfind('\n\n', start, end)
+            if paragraph_end != -1 and paragraph_end > start:
+                end = paragraph_end + 2  # 包括两个换行符
+            else:
+                # 查找最近的句子结束位置
+                sentence_end = max(text.rfind('。', start, end),
+                                  text.rfind('！', start, end),
+                                  text.rfind('？', start, end),
+                                  text.rfind('.', start, end))
+                if sentence_end != -1 and sentence_end > start:
+                    end = sentence_end + 1
+        
+        chunk = text[start:end]
+        chunks.append(chunk)
+        
+        # 设置下一个块的起始位置（带重叠）
+        start = end - overlap if end - overlap > start else end
+        if start >= text_length:
+            break
+    
+    return chunks
+
+def generate_chunk_summary(text):
+    """为文本块生成摘要片段"""
+    # 构造完整提示词
+    prompt = f"<|im_start|>system\n{CHUNK_PROMPT}<|im_end|>\n<|im_start|>user\n{text}<|im_end|>\n<|im_start|>assistant\n"
+    
+    # 模型推理
+    try:
+        output = llm(
+            prompt,
+            max_tokens=400,    # 限制输出长度
+            temperature=0.3,   # 降低随机性
+            stop=["<|im_end|>"],  # 停止标记
+            echo=False,         # 不返回提示词
+            stream=False        # 禁用流式输出
+        )
+        
+        return output['choices'][0]['text'].strip()
+    except Exception as e:
+        print(f"生成分块摘要时出错: {str(e)}")
+        return "分块摘要生成失败"
+
+def generate_final_summary(text):
+    """生成最终结构化摘要"""
+    # 构造完整提示词
+    prompt = f"<|im_start|>system\n{SYSTEM_PROMPT}<|im_end|>\n<|im_start|>user\n{text}<|im_end|>\n<|im_start|>assistant\n"
+    
+    # 模型推理
+    try:
+        output = llm(
+            prompt,
+            max_tokens=800,    # 减少最大输出长度
+            temperature=0.3,   # 降低随机性
+            stop=["<|im_end|>"],  # 停止标记
+            echo=False,         # 不返回提示词
+            stream=False        # 禁用流式输出
+        )
+        
+        return output['choices'][0]['text'].strip()
+    except Exception as e:
+        print(f"生成最终摘要时出错: {str(e)}")
+        return "最终摘要生成失败"
+
+def generate_offline_summary(text):
+    """使用离线模型生成结构化摘要（自动处理长文本）"""
+    # 清洗输入文本
+    text = clean_input_text(text)
+    
+    # 如果文本较短，直接生成摘要
+    if len(text) <= MAX_CHUNK_SIZE:
+        return generate_final_summary(text)
+    
+    print(f"文档过长 ({len(text)} 字符)，进行分段处理...")
+    
+    # 分割文本
+    chunks = split_text(text)
+    print(f"分割为 {len(chunks)} 个段落")
+    
+    # 为每个段落生成摘要
+    chunk_summaries = []
+    for i, chunk in enumerate(chunks):
+        print(f"处理段落 {i+1}/{len(chunks)} (长度: {len(chunk)} 字符)")
+        summary = generate_chunk_summary(chunk)
+        chunk_summaries.append(summary)
+    
+    # 合并摘要片段
+    combined_summary = "\n\n".join(chunk_summaries)
+    print(f"合并摘要总长度: {len(combined_summary)} 字符")
+    
+    # 生成最终摘要
+    final_summary = generate_final_summary(combined_summary)
+    return final_summary
+
+def clean_input_text(text):
+    """清洗输入文本，提高模型理解能力"""
+    # 移除占位符
+    text = re.sub(r'\(此处为[^)]+\)', '', text)
+    # 移除多余空行
+    text = re.sub(r'\n\s*\n', '\n\n', text)
+    # 移除Markdown注释
+    text = re.sub(r'<!--.*?-->', '', text, flags=re.DOTALL)
+    # 移除HTML标签
+    text = re.sub(r'<[^>]+>', '', text)
+    # 标准化标点
+    text = re.sub(r'[。，；：、]', lambda m: {'。': '.', '，': ',', '；': ';', '：': ':', '、': ','}[m.group(0)], text)
+    
+    # 截断过长文本
+    max_length = 15000  # 根据模型能力调整
+    if len(text) > max_length:
+        print(f"文本过长，截断至 {max_length} 字符")
+        # 保留开头和结尾重要部分
+        text = text[:int(max_length*0.6)] + "\n[...中间内容省略...]\n" + text[-int(max_length*0.4):]
+    
+    return text.strip()
+
+def save_summary(original_file_path: Path, output_base: Path, input_dir: Path, original_content: str, summary: str) -> bool:
+    """保存摘要到新文件"""
+    # 获取原始文件相对于输入目录的路径
+    relative_path = original_file_path.relative_to(input_dir)
+    
+    # 构建输出目录路径
+    output_path = output_base / relative_path.parent if output_base else original_file_path.parent
+    
+    # 确保输出目录存在
+    output_path.mkdir(parents=True, exist_ok=True)
+    
+    # 获取原始文件名（不含扩展名）
+    base_name = original_file_path.stem
+    output_file = output_path / f"{base_name}_summary.md"
+    
+    try:
+        with open(output_file, 'w', encoding='utf-8') as f:
+            # 写入原始内容
+            f.write(f"# 原始文本\n\n")
+            f.write(original_content)
+            f.write("\n\n---\n\n")
+            
+            # 写入摘要
+            f.write(f"# 文本摘要\n\n")
+            f.write(summary)
+        
+        print(f"摘要已保存到: {output_file}")
+        return True
+    except Exception as e:
+        print(f"保存文件失败: {e}")
+        return False
+
+def should_skip_summary(file_path: Path, output_base: Path, input_dir: Path, overwrite: bool) -> bool:
+    """判断是否应该跳过摘要处理"""
+    file_name = file_path.name
+    
+    # 规则1: 文件名包含"summary"的直接跳过
+    if "summary" in file_name.lower():
+        return True
+    
+    # 规则2: 检查对应的摘要文件是否已存在
+    relative_path = file_path.relative_to(input_dir)
+    output_path = output_base / relative_path.parent if output_base else file_path.parent
+    
+    # 确保输出目录存在
+    output_path.mkdir(parents=True, exist_ok=True)
+    
+    base_name = file_path.stem
+    summary_file = output_path / f"{base_name}_summary.md"
+    
+    return summary_file.exists() and not overwrite
+
+def run_transcription(args):
+    """运行转录流程"""
+    print("\n" + "="*50)
+    print("开始转录流程")
+    print("="*50)
+    
+    # 检查是否安装了pipeline模块
+    try:
+        from pipeline import InferencePipeline
+    except ImportError:
+        print("错误：无法导入 pipeline 模块，转录功能不可用")
+        return
+    
+    files = collect_media_files(args.input, args.recursive)
+    if not files:
+        print(f"[WARN] 未找到可处理的媒体文件：{args.input}")
+        return
+    
+    pipe = InferencePipeline(
+        model_dir=args.model_dir,
+        diarize=not args.no_diarize,
+        device=args.device,
+    )
+    
+    print(f"找到 {len(files)} 个媒体文件需要处理")
+    
+    if args.workers <= 1:
+        for f in files:
+            path, ok, msg = process_transcription(f, args, pipe)
+            print(f"[{'OK' if ok else 'ERR'}] {f} -> {path} ({msg})")
+    else:
+        with futures.ThreadPoolExecutor(max_workers=args.workers) as ex:
+            tasks = {ex.submit(process_transcription, f, args, pipe): f for f in files}
+            for t in futures.as_completed(tasks):
+                path, ok, msg = t.result()
+                src = tasks[t]
+                print(f"[{'OK' if ok else 'ERR'}] {src} -> {path} ({msg})")
+    
+    print("转录流程完成！")
+
+def run_offline_summarization(args):
+    """运行离线摘要生成流程"""
+    print("\n" + "="*50)
+    print("开始离线摘要生成流程")
+    print("="*50)
+    
+    # 确保已加载模型
+    if llm is None:
+        print("错误：离线模型未加载！")
+        return
+    
+    # 收集所有转录生成的 *_merge.md 文件
+    files = []
+    pattern = "**/*_merge.md" if args.recursive else "*_merge.md"
+    for p in args.input.glob(pattern):
+        if p.is_file() and p.suffix.lower() == ".md":
+            files.append(p)
+    
+    if not files:
+        print(f"[WARN] 未找到可处理的合并文件(*_merge.md)：{args.input}")
+        return
+    
+    # 过滤需要处理的文件
+    to_process = []
+    for file_path in files:
+        if should_skip_summary(file_path, args.output, args.input, args.overwrite):
+            print(f"跳过文件: {file_path}")
+        else:
+            to_process.append(file_path)
+    
+    print(f"找到 {len(to_process)} 个需要生成摘要的文件")
+    
+    # 进度条显示
+    processed_count = 0
+    skipped_count = 0
+    error_count = 0
+    
+    for file_path in tqdm(to_process, desc="生成摘要中"):
+        try:
+            # 读取文件内容
+            original_content = read_md_file(file_path)
+            if not original_content:
+                print("文件内容为空，跳过处理")
+                skipped_count += 1
+                continue
+            
+            # 使用离线模型生成摘要
+            print(f"正在为 {file_path.name} 生成摘要...")
+            summary = generate_offline_summary(original_content)
+            
+            if not summary:
+                print("摘要生成失败，跳过此文件")
+                error_count += 1
+                continue
+            
+            # 保存结果（保持原始文件目录结构）
+            if save_summary(file_path, args.output, args.input, original_content, summary):
+                processed_count += 1
+                print(f"处理成功: {file_path}")
+        except Exception as e:
+            error_count += 1
+            print(f"处理失败 {file_path}: {str(e)}")
+    
+    print("\n===== 离线摘要生成完成 =====")
+    print(f"成功处理: {processed_count} 个文件")
+    print(f"跳过处理: {skipped_count} 个文件")
+    print(f"处理失败: {error_count} 个文件")
+
+
+def process_rename(file_path: Path, input_dir: Path, output_base: Path) -> Tuple[str, str]:
+    """处理单个Markdown文件的重命名"""
+    relative_path = file_path.relative_to(input_dir)
+    output_path = output_base / relative_path.parent if output_base else file_path.parent
+    
+    # 确保输出目录存在
+    output_path.mkdir(parents=True, exist_ok=True)
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+            
+            # 匹配 # 标题 后跟着的下一行内容
+            match = re.search(r'#\s*标题\s*\n(.+?)\s*\n', content)
+            
+            if match:
+                # 获取捕获组中的实际标题
+                ai_title = match.group(1).strip()
+                
+                # 清理标题中的特殊字符
+                clean_title = re.sub(r'[\\/*?:"<>|]', '_', ai_title)
+                
+                # 创建新文件名
+                name_part = file_path.stem
+                new_filename = f"{clean_title}_{name_part}.md"
+                
+                # 创建新文件路径
+                new_filepath = output_path / new_filename
+                
+                # 检查文件是否已存在
+                if new_filepath.exists():
+                    print(f"! 文件已存在，跳过: {new_filepath}")
+                    return "skipped", str(file_path)
+                
+                # 创建新文件
+                shutil.copy2(file_path, new_filepath)
+                
+                print(f"✓ 创建新文件: {new_filepath}")
+                return "processed", str(new_filepath)
+            else:
+                # 如果未找到标题，打印前200字符帮助调试
+                preview = content[:200].replace('\n', '\\n')
+                print(f"× 跳过文件（未找到标题）: {file_path}")
+                print(f"   文件开头预览: '{preview}'")
+                return "skipped", str(file_path)
+                
+    except Exception as e:
+        print(f"! 处理文件 {file_path} 时出错: {str(e)}")
+        return "error", str(file_path)
+
+def run_renaming(args):
+    """运行重命名流程"""
+    print("\n" + "="*50)
+    print("开始文件重命名流程")
+    print("="*50)
+    
+    # 收集所有摘要文件
+    pattern = "**/*_summary.md" if args.recursive else "*_summary.md"
+    summary_files = []
+    for p in args.input.glob(pattern):
+        if p.is_file() and p.suffix.lower() == ".md":
+            summary_files.append(p)
+    
+    if not summary_files:
+        print(f"[WARN] 未找到任何摘要文件 (*_summary.md): {args.input}")
+        return
+    
+    print(f"找到 {len(summary_files)} 个摘要文件，开始处理...")
+    print("-" * 50)
+    
+    processed_count = 0
+    skipped_count = 0
+    error_count = 0
+    
+    for file_path in summary_files:
+        status, new_path = process_rename(file_path, args.input, args.output)
+        if status == "processed":
+            processed_count += 1
+        elif status == "skipped":
+            skipped_count += 1
+        else:
+            error_count += 1
+    
+    print("-" * 50)
+    print("\n重命名结果统计:")
+    print(f"- 成功处理: {processed_count} 个文件")
+    print(f"- 跳过处理: {skipped_count} 个文件")
+    print(f"- 处理出错: {error_count} 个文件")
+    print("重命名流程完成！")
+
+def main():
+    """主函数"""
+    parser = argparse.ArgumentParser(description="媒体文件转录、离线摘要生成与重命名工具")
+    
+    # 输入/输出参数
+    parser.add_argument("--input", type=Path, required=True, help="输入目录路径")
+    parser.add_argument("--output", type=Path, help="输出目录路径（可选）")
+    parser.add_argument("--recursive", action="store_true", default=True, help="递归扫描子目录（默认开启）")
+    parser.add_argument("--overwrite", action="store_true", help="覆盖已存在的结果文件")
+    
+    # 转录相关参数
+    parser.add_argument("--model-dir", type=str, help="本地模型缓存/权重目录（离线）")
+    parser.add_argument("--device", type=str, default="cuda", choices=["cuda", "cpu"], help="转录使用的设备")
+    parser.add_argument("--no-diarize", action="store_true", help="转录时禁用说话人分离")
+    parser.add_argument("--workers", type=int, default=1, help="转录并发数（GPU 建议 1）")
+    parser.add_argument("--inplace", action="store_true", default=True, help="在源文件所在目录生成输出（默认开启）")
+    
+    # 功能选择参数
+    parser.add_argument("--transcribe-only", action="store_true", help="仅执行转录，不生成摘要")
+    parser.add_argument("--summarize-only", action="store_true", help="仅生成摘要，不执行转录")
+    parser.add_argument("--rename-only", action="store_true", help="仅执行重命名，不执行转录和摘要")
+    
+    args = parser.parse_args()
+    
+    # 确保输入目录存在
+    args.input = args.input.resolve()
+    if not args.input.exists():
+        print(f"错误：输入目录不存在：{args.input}")
+        return
+    
+    # 确保输出目录存在
+    if args.output:
+        args.output = args.output.resolve()
+        args.output.mkdir(parents=True, exist_ok=True)
+    
+    print(f"输入目录: {args.input}")
+    if args.output:
+        print(f"输出目录: {args.output}")
+    if args.recursive:
+        print("将递归处理子目录")
+    if args.overwrite:
+        print("将覆盖已存在的结果文件")
+    
+    # 加载离线模型
+    if not args.transcribe_only and not args.rename_only:
+        load_offline_model()
+    
+    # 根据参数选择执行流程
+    if args.rename_only:
+        # 仅执行重命名
+        run_renaming(args)
+    else:
+        # 执行转录和摘要
+        if not args.summarize_only:
+            run_transcription(args)
+        if not args.transcribe_only:
+            run_offline_summarization(args)
+        # 在摘要生成后执行重命名
+        run_renaming(args)
+    
+    print("\n所有处理完成！")
+
+if __name__ == "__main__":
+    main()
